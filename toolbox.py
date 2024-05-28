@@ -35,18 +35,20 @@ def pause(low:float = 0, high:float = 2.0, status:bool = False) :
 	# Pause a random amount of time.
 	# Low & high are seconds.
 	# Helpful for rate pacing.
-	# Last update: 2024/05/28 @ 10:30am.
+	# Last update: 2024/05/28 @ 01:45pm.
 	# --------------------------------------------
 
 	# --- Check input. ---
 	if low > high :
 		print_l('Error: min(' + str(low) + ') > max(' + str(high) + ')')
 		return False
+	
+	# --- Vars. ---
+	min = int(low)*100
+	max = int(high)*100
 
 	# --- Calculate pause time. ---
-	min_val = int(low = 100)
-	max_val = int(high = 100)
-	pause_time = round(random.randint(min_val,max_val)/100, 2)
+	pause_time = round(random.randint(min,max)/100, 2)
 	if status :
 		print_l('  Pause for ' + str(pause_time) + ' seconds')
 

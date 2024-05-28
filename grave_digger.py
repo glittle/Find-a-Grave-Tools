@@ -12,7 +12,7 @@
 # Update URI:        https://github.com/doug-foster/find-a-grave-scraper
 # Text Domain:       find-a-grave-scraper
 #
-# Last update: 2024/05/28 @ 10:30am.
+# Last update: 2024/05/28 @ 01:30pm.
 # Comments: 
 # --------------------------------------------
 
@@ -284,7 +284,7 @@ def build_master_list(path_to_stash) :
 	# 2. Combine all group lists from all cemetery folders into a master list. 
 	# 3. Master list is a snapshot of all URLs at _this_ point in time.
 	# global master_urls[] is master list until saved by write_master_list().
-	# Last update: 2024/05/28 @ 10:30am.
+	# Last update: 2024/05/28 @ 01:30pm.
 	# --------------------------------------------
 
 	# --- Define vars. ---
@@ -294,7 +294,7 @@ def build_master_list(path_to_stash) :
 	# --- Build a master list of all group lists. ---
 	master_urls = []  # New list.
 	for cemetery_folder in cemetery_folders :
-		cemetery_id = cemetery_folder.split('data/')[1].split('_')[0]
+		cemetery_id = cemetery_folder.split(path_to_stash)[1].split('_')[0]
 		for group_name in family_groups_names :
 			folder_name = cemetery_folder + cemetery_id + '_' + group_name
 			list_name = folder_name + '_list.txt'
