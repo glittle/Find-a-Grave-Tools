@@ -12,7 +12,7 @@
 # Update URI:        https://github.com/doug-foster/find-a-grave-scraper
 # Text Domain:       find-a-grave-scraper
 #
-# Last update: 2024/05/28 @ 01:30pm.
+# Last update: 2024/05/28 @ 04:15pm.
 # Comments: 
 # --------------------------------------------
 
@@ -41,7 +41,7 @@ master_list = 'master_list.txt'
 def dig_instructions() :
 	# --------------------------------------------
 	# Return a dictionary of digging instructions.
-	# Last update: 2024/05/28 @ 10:30am.
+	# Last update: 2024/05/28 @ 04:15pm.
 	# --------------------------------------------
 
 	# --- Vars. ---
@@ -74,13 +74,7 @@ def dig_instructions() :
 		if len(this_line) > 1 :  # There are one or more group(s)).
 			groups = this_line[1].rstrip(',').split(',')  # Split them.
 		else :  # No groups.
-			if 'dig_graves.py' == called_by :
-				groups = data_groups_all
-			elif 'stash_graves.py' == called_by :
-				groups = family_groups_all
-		if 'dig_graves.py' == called_by :
-			check_groups = data_groups_all
-		elif 'stash_graves.py' == called_by :
+			groups = family_groups_all
 			check_groups = family_groups_all
 
 		# --- Remove duplicates. ---
@@ -335,3 +329,11 @@ def get_gmap(this_soup, status:bool = False) :
 		toolbox.print_l('gmap = "' + gmap + '"')
 
 	return gmap
+
+def dig(this_soup, row_data) :
+	# --------------------------------------------
+	# Use Beautiful Soup library to find Google Map URL.
+	# Last update: 2024/05/28 @ 10:30am.
+	# --------------------------------------------
+
+	row_data.name

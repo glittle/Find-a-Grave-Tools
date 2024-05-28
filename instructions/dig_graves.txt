@@ -33,12 +33,12 @@
 #      2136908 : burial, parent, spouse, child, sibling, half-sibling
 # --------------------------------------------
 
-# 2353265 - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 2243718 - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 2145876 - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 2136908 - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 1682503 - IOOF (aka Odd Fellows Cemetery) - Sherrill, Dubuque County, Iowa, USA
-# 1676398 - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 2353265 - PRES - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 2243718 - UCC - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 2145876 - SML - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 2136908 - UMC - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 1682503 - IOOF - Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 1676398 - SPP - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA
 
 #log
-# 2353265
+2353265
