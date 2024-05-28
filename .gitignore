@@ -1,2 +1,6 @@
-data
-scratch.txt
+output/~$*
+scratch
+logs/*
+stash/*
+__pycach*
+find-a-grave-scraper.code-workspace

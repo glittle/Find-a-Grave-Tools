@@ -21,20 +21,21 @@ stash_graves.py is used to:
 	- Cemeteries are identified by the same numeric ID 'Find a Grave' uses. 
 	- Groups are: burial, parent, spouse, child, sibling, half-sibling
 - STASH the pulled pages in a local directory (much like how a cache works).
+
 dig_graves.py is used to:
 - EXTRACT the data
-	- Leverages the [Beautiful Soup Python package](https://pypi.org/project/beautifulsoup4/)
+	- Leverages the [Beautiful Soup](https://pypi.org/project/beautifulsoup4/) Python package
 - ANALYZE the data
 - REPORT data to a saved Excel spreadsheet
-	- Uses the [XlsxWriter Python package](https://pypi.org/project/XlsxWriter/)
+	- Uses the [XlsxWriter](https://pypi.org/project/XlsxWriter/) Python package
 
 ## Further development
-As mentioned earlier, these scripts were written for a specific project; they are not intended to be an open-source project. Please use them as-is and do not expect on-going support or updates. Hopefully though they will provide you with inspiration for your own versions.
+As mentioned earlier, these scripts were written for a specific project. They are not intended to be an open-source project. Please use them as-is and do not expect on-going support or updates. Hopefully though they will provide you with inspiration for your own versions.
 ## License
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a [copy of the GNU General Public License](LICENSE.txt) along with this program. If not, see https://www.gnu.org/licenses/.
+A copy of the GNU General Public License is [included](LICENSE.txt) in this repository. Please also refer to https://www.gnu.org/licenses/.
 ## About me
 You can lern more about the developer at https://dougfoster.me.
