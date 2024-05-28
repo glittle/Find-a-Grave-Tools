@@ -1,0 +1,52 @@
+# --------------------------------------------
+# Name:              stash_graves.txt
+# URI:               https://github.com/doug-foster/find-a-grave-scraper
+# Description:	     Instructions file for stash_graves.py
+# Version:		     1.00
+# Requires at least: 3.1
+# Requires Python:   3.12
+# Author:            Doug Foster
+# Author URI:        http://dougfoster.me
+# License:           GPL v3 or later
+# License URI:       https://www.gnu.org/licenses/agpl-3.0.html
+# Update URI:        https://github.com/doug-foster/find-a-grave-scraper
+# Text Domain:       find-a-grave-scraper
+#
+# Last update: 2024/05/28 @ 10:15am
+# Comments:
+#   stash_graves.py rerieves & saves "Find a Grave" memorial pages for a cemetery.
+#   Schema:
+#      log = create a log file
+#      cemetery_id : group, group, ...
+#      cemetery_id = numeric Find a Grave cemetery ID
+#      valid groups = burial, parent, spouse, child, sibling, half-sibling
+#   Colon (:) separates cemetery_id and groups
+#   Comma (,) separates groups
+#   cemetery_id without group(s) will convert to include all groups
+#   For data integrity, if getting all groups, get a fresh copy of all burials.
+#   If "log" appears by itself on a line, start a log file.
+#   Examples:
+#      2136908 : child
+#      2136908 : burial, parent, spouse, child, sibling, half-sibling
+#      2136908 (converts to ...)
+#      2136908 : family (converts to ...)
+#      2136908 : burial, parent, spouse, child, sibling, half-sibling
+# --------------------------------------------
+
+# 2353265 - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 2243718 - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 2145876 - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 2136908 - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
+# 1682503 - IOOF (aka Odd Fellows Cemetery) - Sherrill, Dubuque County, Iowa, USA
+# 1676398 - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA
+
+#log
+#2136908 : burial
+1676398 : parent, spouse, child, sibling, half-sibling
+# 2243718
+# 2353265 : burial
+# 1676398
+# 1676398 : sibling
+# 2145876 : sibling, half-sibling
+# 353265 : half-sibling
+# 2243718 : half-sibling
