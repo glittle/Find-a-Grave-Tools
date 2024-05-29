@@ -12,7 +12,7 @@
 # Update URI:        https://github.com/doug-foster/find-a-grave-scraper
 # Text Domain:       find-a-grave-scraper
 #
-# Last update: 2024/05/28 @ 10:30pm.
+# Last update: 2024/05/29 @ 01:15pm.
 # Comments: 
 # --------------------------------------------
 
@@ -20,6 +20,7 @@
 # Standard Libraries.
 import os
 import glob
+import re
 # Packages.
 import inspect
 from bs4 import BeautifulSoup
@@ -50,7 +51,9 @@ name = ['name', 'Name']
 nickname = ['nickname', 'Nickname']
 id = ['id', 'ID']
 birth = ['birth', 'Birth']
+birth_location = ['birth_location', 'Birth Location']
 death = ['death', 'Death']
+death_location = ['death_location', 'Death Location']
 parents_surname = ['parents_surname', 'Parent\'s Surname']
 parents = ['parents', 'Parents']
 spouses = ['spouses', 'Spouses']
@@ -75,7 +78,9 @@ row_data = [
 	nickname,
 	id,
 	birth,
+	birth_location,
 	death,
+	death_location,
 	parents_surname,
 	parents,
 	spouses,
@@ -399,30 +404,49 @@ def dig(burial_file_name, num_row) :
 def dig_this(this_soup, element) :
 	# --------------------------------------------
 	# Use Beautiful Soup library to find a data element.
-	# Last update: 2024/05/28 @ 10:30pm.
+	# Last update: 2024/05/29 @ 01:15pm.
 	# --------------------------------------------
 
 	# --- Check input. ---
 	if 'this_soup' not in locals():
 		toolbox.print_l('Error: no Soup.')
 		return False
+	
+	# --- Find the script element which sets lots of vars. ---
+	scripts = this_soup.find_all('script')
+	for script in scripts :
+		if None != script.string and \
+			-1 != script.string.find('memorialCemeteryId') :
+			break
+	script_vars = script.string.split('\n')
 
 	# --- Find data value. ---
 	match element:
 		case 'cemetery':
-			cell_value = ''
+			element_id = 'memorialCemeteryId'
+			cell_value = get_script_var_value(element_id, script_vars)
 		case 'surname':
-			cell_value = ''
+			element_id = 'lastName'
+			cell_value = get_script_var_value(element_id, script_vars)
 		case 'name':
-			cell_value = ''
+			element_id = 'fullName'
+			cell_value = get_script_var_value(element_id, script_vars)
 		case 'nickname':
 			cell_value = ''
 		case 'id':
-			cell_value = ''
+			element_id = 'personId'
+			cell_value = get_script_var_value(element_id, script_vars)
 		case 'birth':
 			cell_value = ''
+		case 'birth_location':
+			location = this_soup.find(attrs={'itemprop': 'birthPlace'}).string
+			cell_value = location.replace('\n', '').lstrip()
 		case 'death':
-			cell_value = ''
+			element_id = 'deathDate'
+			cell_value = get_script_var_value(element_id, script_vars)
+		case 'death_location':
+			location = this_soup.find(attrs={'itemprop': 'deathPlace'}).string
+			cell_value = location.replace('\n', '').lstrip()
 		case 'parents_surname':
 			cell_value = ''
 		case 'parents':
@@ -436,9 +460,10 @@ def dig_this(this_soup, element) :
 		case 'veteran':
 			cell_value = ''
 		case 'cenotaph':
-			cell_value = ''
+			element_id = 'isCenotaph'
+			cell_value = get_script_var_value(element_id, script_vars)
 		case 'plot':
-			cell_value = ''
+			cell_value = this_soup.find(id='plotValueLabel').attrs['href']
 		case 'bio':
 			cell_value = ''
 		case 'google_map':
@@ -459,3 +484,26 @@ def dig_this(this_soup, element) :
 			toolbox.print_l('Error: no group.')
 			cell_value = ''
 	return cell_value
+
+def get_script_var_value(var_id, vars) :
+	# --------------------------------------------
+	# Use Beautiful Soup library to find a data element.
+	# Last update: 2024/05/29 @ 01:15pm.
+	# --------------------------------------------
+
+	# --- Return var. ---
+	for var in vars :
+		if var.find(var_id) > 0 :
+			break
+	var = var.split(':')[1]  # Split off the var string.
+	double_quotes = re.search('".*"', var) # Does it use "?
+	single_quotes = re.search('\'.*\'', var) # Does it use '?
+	if None != double_quotes :
+		var = double_quotes.group().replace('"', '').rstrip()
+	if None != single_quotes :
+		var = single_quotes.group().replace('"', '').replace(' ', '')
+	if var.find('false,') :  # Boolean?
+		var = False
+	elif var.find('true,') :
+		var = True
+	return var
