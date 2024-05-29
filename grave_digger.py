@@ -12,7 +12,7 @@
 # Update URI:        https://github.com/doug-foster/find-a-grave-scraper
 # Text Domain:       find-a-grave-scraper
 #
-# Last update: 2024/05/28 @ 04:15pm.
+# Last update: 2024/05/28 @ 10:30pm.
 # Comments: 
 # --------------------------------------------
 
@@ -36,6 +36,63 @@ family_groups_names = ['burials', 'parents', 'spouses', 'children',
 data_groups_all = ['totals', 'names']
 master_urls = []
 master_list = 'master_list.txt'
+
+cemetery_abreviation = {
+	2353265 : 'PRES', # Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
+	2243718 : 'UCC',  # Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
+	2145876 : 'SML',  # Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
+	1682503 : 'IOOF', # Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
+	1676398 : 'SPP'   # Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
+}
+cemetery = ['cemetery', 'Cemetery']
+surname = ['surname', 'Surname']
+name = ['name', 'Name']
+nickname = ['nickname', 'Nickname']
+id = ['id', 'ID']
+birth = ['birth', 'Birth']
+death = ['death', 'Death']
+parents_surname = ['parents_surname', 'Parent\'s Surname']
+parents = ['parents', 'Parents']
+spouses = ['spouses', 'Spouses']
+father = ['father', 'Father']
+mother = ['mother', 'Mother']
+veteran = ['veteran', 'Veteran']
+cenotaph = ['cenotaph', 'Cenotaph']
+plot = ['plot', 'Plot']
+bio = ['bio', 'Bio']
+google_map = ['google_map', 'Google Map']
+latitude = ['latitude', 'Latitude']
+longitude = ['longitude', 'Longitude']
+inscription = ['Inscription']
+inscription = ['inscription', 'Inscription']
+gravesite_details = ['gravesite_details', 'Gravesite Details']
+notes = ['notes', 'Notes']
+burial_type = ['burial_type', 'Burial Type']
+row_data = [
+	cemetery,
+	surname,
+	name,
+	nickname,
+	id,
+	birth,
+	death,
+	parents_surname,
+	parents,
+	spouses,
+	father,
+	mother,
+	veteran,
+	cenotaph,
+	plot,
+	bio,
+	google_map,
+	latitude,
+	longitude,
+	inscription,
+	gravesite_details,
+	notes,
+	burial_type
+]
 
 # --- Functions. ---
 def dig_instructions() :
@@ -312,10 +369,37 @@ def save_master_list(path_to_stash) :
 		f.write(url + '\n')
 	f.close()
 
-def get_gmap(this_soup, status:bool = False) :
+def dig(burial_file_name, num_row) :
 	# --------------------------------------------
-	# Use Beautiful Soup library to find Google Map URL.
-	# Last update: 2024/05/28 @ 10:30am.
+	# Build a burial row for the output spreadsheet.
+	# Last update: 2024/05/28 @ 10:30pm.
+	# --------------------------------------------
+
+	# --- Vars. ---
+	cols_to_write = []
+
+	# --- Fill the row. ---
+	if 0 == num_row :
+		# Header row.
+		# Loop columns. Position [index][1] is column title.
+		for index in range(len(row_data)) :
+			cols_to_write.append(row_data[index][1])
+	else:
+		# Make burial soup.
+		f = open(burial_file_name, 'r')
+		soup = BeautifulSoup(f.read(), 'html.parser')
+		f.close
+		# Loop columns. Position [index][0] is switch match for dig_this()).
+		for index in range(len(row_data)) :
+			element = dig_this(soup, row_data[index][0])
+			cols_to_write.append(element)
+
+	return cols_to_write
+
+def dig_this(this_soup, element) :
+	# --------------------------------------------
+	# Use Beautiful Soup library to find a data element.
+	# Last update: 2024/05/28 @ 10:30pm.
 	# --------------------------------------------
 
 	# --- Check input. ---
@@ -323,17 +407,55 @@ def get_gmap(this_soup, status:bool = False) :
 		toolbox.print_l('Error: no Soup.')
 		return False
 
-	# --- Find element. ---
-	gmap = this_soup.find(id='gpsValue').attrs['href']
-	if status :
-		toolbox.print_l('gmap = "' + gmap + '"')
-
-	return gmap
-
-def dig(this_soup, row_data) :
-	# --------------------------------------------
-	# Use Beautiful Soup library to find Google Map URL.
-	# Last update: 2024/05/28 @ 10:30am.
-	# --------------------------------------------
-
-	row_data.name
+	# --- Find data value. ---
+	match element:
+		case 'cemetery':
+			cell_value = ''
+		case 'surname':
+			cell_value = ''
+		case 'name':
+			cell_value = ''
+		case 'nickname':
+			cell_value = ''
+		case 'id':
+			cell_value = ''
+		case 'birth':
+			cell_value = ''
+		case 'death':
+			cell_value = ''
+		case 'parents_surname':
+			cell_value = ''
+		case 'parents':
+			cell_value = ''
+		case 'spouses':
+			cell_value = ''
+		case 'father':
+			cell_value = ''
+		case 'mother':
+			cell_value = ''
+		case 'veteran':
+			cell_value = ''
+		case 'cenotaph':
+			cell_value = ''
+		case 'plot':
+			cell_value = ''
+		case 'bio':
+			cell_value = ''
+		case 'google_map':
+			cell_value = this_soup.find(id='gpsValue').attrs['href']
+		case 'latitude':
+			cell_value = ''
+		case 'longitude':
+			cell_value = ''
+		case 'inscription':
+			cell_value = ''
+		case 'gravesite_details':
+			cell_value = ''
+		case 'notes':
+			cell_value = ''
+		case 'burial_type':
+			cell_value = ''
+		case '' :
+			toolbox.print_l('Error: no group.')
+			cell_value = ''
+	return cell_value
