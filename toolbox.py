@@ -1,29 +1,30 @@
-# --------------------------------------------
-# Name:              toolbox.py
-# URI:               https://github.com/doug-foster/find-a-grave-scraper
-# Description:	     Generalized functions for find-a-grave-scraper
-# Version:		     1.00
-# Requires at least: 3.1
-# Requires Python:   3.12
-# Author:            Doug Foster
-# Author URI:        http://dougfoster.me
-# License:           GPL v3 or later
-# License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-# Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-# Text Domain:       find-a-grave-scraper
+# ------------------------------------------------\
+#  Generalized functions for find-a-grave-scraper.
+#  Last update: 2024/06/01 @ 06:00pm.
 #
-# Last update: 2024/05/28 @ 10:30pm.
-# Comments: 
-# --------------------------------------------
+#  Name:              toolbox.py
+#  URI:               https://github.com/doug-foster/find-a-grave-scraper
+#  Description:	     Generalized functions for find-a-grave-scraper
+#  Version:		     1.00
+#  Requires at least: 3.1
+#  Requires Python:   3.12
+#  Author:            Doug Foster
+#  Author URI:        http://dougfoster.me
+#  License:           GPL v3 or later
+#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
+#  Text Domain:       find-a-grave-scraper
+# ------------------------------------------------\
 
 # --- Import libraries. ---
 # Standard Libraries.
-import time
-import os
-import random
-import inspect
+import time  # https://docs.python.org/3/library/time.html
+import os  # https://docs.python.org/3/library/os.html
+import random  # https://docs.python.org/3/library/random.html
+import re  # https://docs.python.org/3/library/re.html
+import inspect  # https://docs.python.org/3/library/inspect.html
+import html  # https://docs.python.org/3/library/html.html
 # Packages.
-import inspect
 # My modules.
 
 # --- Globals. ---
@@ -31,13 +32,21 @@ path_to_instructions = 'instructions/'
 log_file = None
 
 # --- Functions. ---
+# pause(low, high, status)
+# get_instructions(level)
+# remove_last_byte(f, path)
+# print_l(string, end)
+# log(start)
+# get_url(session, url)
+
+# --------------------------------------------\
+#  Pause a random amount of time.
+#  Last update: 2024/05/28 @ 01:45pm.
+#
+#  Low & high are seconds.
+#  Helpful for rate pacing.
+# --------------------------------------------\
 def pause(low:float = 0, high:float = 2.0, status:bool = False) :
-	# --------------------------------------------
-	# Pause a random amount of time.
-	# Low & high are seconds.
-	# Helpful for rate pacing.
-	# Last update: 2024/05/28 @ 01:45pm.
-	# --------------------------------------------
 
 	# --- Check input. ---
 	if low > high :
@@ -56,13 +65,16 @@ def pause(low:float = 0, high:float = 2.0, status:bool = False) :
 	# -- Pause. --
 	time.sleep(pause_time)
 	return True
+# --------------------------------------------/
 
+
+# --------------------------------------------\
+#  Read data from an instructions file, return as a list.
+#  Last update: 2024/05/28 @ 10:30am.
+#
+#  Naming format - /instructions/script.txt for script.py.
+# --------------------------------------------\
 def get_instructions(level:int = 0) :
-	# --------------------------------------------
-	# Read data from an instructions file, return as a list.
-	# Naming format - /instructions/script.txt for script.py.
-	# Last update: 2024/05/28 @ 10:30am.
-	# --------------------------------------------
 
 	# --- Vars. ---
 	level += 1
@@ -92,36 +104,42 @@ def get_instructions(level:int = 0) :
 		instructions.append(line)
 	
 	return instructions
+# --------------------------------------------/
 
+
+# --------------------------------------------\
+#  Remove the last byte from a file.
+#  Last update: 2024/05/28 @ 10:30am.
+#
+#  Usually it's a dangling "\n" from writing lines.
+# --------------------------------------------\
 def remove_last_byte(f, path) :
-	# --------------------------------------------
-	# Remove the last byte from a file.
-	# Usually it's a dangling "\n" from writing lines.
-	# Last update: 2024/05/28 @ 10:30am.
-	# --------------------------------------------
 
 	# --- Read/write file. ---
 	if os.path.getsize(path) > 0 :
 		f = open(path, 'br+')
 		f.truncate(f.seek(-1, 2))
 		f.close()
-	
-def print_l(string:str = '', end:str = '\n') :
-	# --------------------------------------------
-	# Replace print with print & log.
-	# Last update: 2024/05/28 @ 10:30am.
-	# --------------------------------------------
-	
+# --------------------------------------------/
+
+
+# --------------------------------------------\
+#  Replace print with print & log.
+#  Last update: 2024/06/01 @ 06:15pm.
+# --------------------------------------------\
+def print_l(string:str = '', last:str = '\n') :
+
 	# --- Print/log file. ---
-	print(string)
+	print(string, end=last)
 	if None != log_file :
 		log_file.write(string + '\n')
+# --------------------------------------------/
 
+# --------------------------------------------\
+#  Open & close a log file.
+#  Last update: 2024/05/28 @ 10:30am.
+# --------------------------------------------\
 def log(start:bool = True) :
-	# --------------------------------------------
-	# Open & close a log file.
-	# Last update: 2024/05/28 @ 10:30am.
-	# --------------------------------------------
 
 	# --- Vars. ---
 	global log_file
@@ -134,12 +152,14 @@ def log(start:bool = True) :
 	else :
 		if None != log_file :
 			log_file.close()
+# --------------------------------------------/
 
+
+# --------------------------------------------\
+#  Given an open session, request a URL.
+#  Last update: 2024/05/28 @ 10:30am.
+# --------------------------------------------\
 def get_url(session, url) :
-	# --------------------------------------------
-	# Given an open session, request a URL.
-	# Last update: 2024/05/28 @ 10:30am.
-	# --------------------------------------------
 
 	# --- Vars. ---
 	tries = 3
@@ -160,3 +180,38 @@ def get_url(session, url) :
 				pause(3, 5, True)  # Pause.
 	
 	return False
+# --------------------------------------------/
+
+
+# --------------------------------------------\
+#  Improve the readability of a string.
+#  Last update: 2024/06/01 @ 06:45pm.
+# --------------------------------------------\
+def clean_string(string) :
+
+	# --- Vars. ---
+	before = string
+
+	# --- Repair. ---
+	string = string.replace('<br>', '</br>')
+	string = string.replace('</br>', '<br/>')
+
+	# --- Replace. ---
+	string = html.unescape(string)  # Html characters (&amp; etc.).
+	string = string.replace('<I>', '')  # 'italics' tags.
+	string = string.replace('</I>', '')  # 'italics' tags.
+	string = string.replace('<I>', '')  # 'bold' tags.
+	string = string.replace('</I>', '')  # 'bold' tags.
+	string = string.replace('<p>', '')  # Opening 'p' tags.
+	string = string.replace('</p>', '\n')  # Closing 'p' tags.
+	string = string.replace('<br/>', '\n')  # Line breaks.
+	string = string.lstrip().lstrip('\n')  # Beginning of string.
+	string = string.rstrip().rstrip('\n')  # End of string.
+	string = string.replace('\n\n\n', '\n')  # Multiple newlines.
+	string = string.replace('\n\n', '\n')  # Multiple newlines.
+	string = string.replace('   ', ' ')  # Multiple spaces.
+	string = string.replace('  ', ' ')  # Multiple spaces.
+	return string
+# --------------------------------------------/
+
+# ------------------------------------------------/

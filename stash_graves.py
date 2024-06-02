@@ -1,32 +1,32 @@
-# --------------------------------------------
-# Name:              stash_graves.py
-# URI:               https://github.com/doug-foster/find-a-grave-scraper
-# Description:	     Create a local stash of Find a Grave memorial pages.
-# Version:		     1.00
-# Requires at least: 3.1
-# Requires Python:   3.12
-# Author:            Doug Foster
-# Author URI:        http://dougfoster.me
-# License:           GPL v3 or later
-# License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-# Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-# Text Domain:       find-a-grave-scraper
+# ------------------------------------------------\
+#  Create a local stash of https://www.findagrave.com memorial pages.
+#  Last update: 2024/05/31 @ 09:45am.
 #
-# Last update: 2024/05/28 @ 11:15am.
-# Comments: 
-# --------------------------------------------
+#  Name:              stash_graves.py
+#  URI:               https://github.com/doug-foster/find-a-grave-scraper
+#  Description:	      Create a local stash of Find a Grave memorial pages
+#  Version:		      1.00
+#  Requires at least: 3.1
+#  Requires Python:   3.12
+#  Author:            Doug Foster
+#  Author URI:        http://dougfoster.me
+#  License:           GPL v3 or later
+#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
+#  Text Domain:       find-a-grave-scraper
+# ------------------------------------------------\
 
 # --- Import libraries. ---
 # Standard Libraries
-import time
-import os
-import shutil
+import time  #https://docs.python.org/3/library/time.html
+import os  # https://docs.python.org/3/library/os.html
+import shutil  # https://docs.python.org/3/library/shutil.html
 # Packages
-import requests
-from bs4 import BeautifulSoup
+import requests  # https://pypi.org/project/requests/
+from bs4 import BeautifulSoup  # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 # My modules
-import toolbox
-import grave_digger
+import toolbox  # https://github.com/doug-foster/find-a-grave-scraper
+import grave_digger  # https://github.com/doug-foster/find-a-grave-scraper
 
 # --- Globals. ---
 path_to_stash = 'stash/'
@@ -123,7 +123,7 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 		toolbox.print_l('Started group ' + group + ' @ ' + 
 			time.strftime('%Y%m%d-%H%M%S') + '.')
 				
-		# --- New group folder & folder list  ---
+		# --- New group folder & folder list.  ---
 		if os.path.isdir(path_to_folder[group]) :  # Folder exists?
 			shutil.rmtree(path_to_folder[group])  # Remove.
 		os.mkdir(path_to_folder[group])  # New folder.
@@ -155,7 +155,7 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 				toolbox.print_l('Searching ' + str(len(burial_urls)) + 
 		  			' burials in cemetery "' + cemetery_id + '", retrieving "' 
 					+ group + '" pages ...')
-				f = open(path_to_list[group], 'w')  # Open family list file
+				f = open(path_to_list[group], 'w')  # Open family list file.
 		this_burial = 1
 		for burial_url in burial_urls :  
 			if 'burial' == group :  # Stash "burial" pages.
@@ -213,3 +213,5 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 toolbox.print_l()  # User status - readability.
 toolbox.print_l('Finished script @ ' + time.strftime('%Y%m%d-%H%M%S') + '.')
 toolbox.print_l('Done.')
+
+# ------------------------------------------------\

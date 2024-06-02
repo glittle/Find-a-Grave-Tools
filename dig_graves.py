@@ -1,86 +1,85 @@
-# --------------------------------------------
-# Name:              dig_graves.py
-# URI:               https://github.com/doug-foster/find-a-grave-scraper
-# Description:	     Extract, analyze, and report data for https://www.findagrave.com memorial pages.
-# Version:		     1.00
-# Requires at least: 3.1
-# Requires Python:   3.12
-# Author:            Doug Foster
-# Author URI:        http://dougfoster.me
-# License:           GPL v3 or later
-# License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-# Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-# Text Domain:       find-a-grave-scraper
+# ------------------------------------------------\
+#  Analyze/report data for https://www.findagrave.com memorial pages.
+#  Last update: 2024/06/02 @ 12:45am.
 #
-# Last update: # Last update: 2024/05/29 @ 01:15pm.
-# Comments: 
-# --------------------------------------------
+#  Name:              dig_graves.py
+#  URI:               https://github.com/doug-foster/find-a-grave-scraper
+#  Description:	     Analyze/report data for https://www.findagrave.com memorial pages.
+#  Version:		     1.00
+#  Requires at least: 3.1
+#  Requires Python:   3.12
+#  Author:            Doug Foster
+#  Author URI:        http://dougfoster.me
+#  License:           GPL v3 or later
+#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
+#  Text Domain:       find-a-grave-scraper
+# ------------------------------------------------\
 
 # --- Import libraries. ---
 # Standard Libraries
-import time
-import os
-import glob
+import time  #https://docs.python.org/3/library/time.html
+import os  # https://docs.python.org/3/library/os.html
+import glob  # https://docs.python.org/3/library/glob.html
 # Packages
-from bs4 import BeautifulSoup
-import xlsxwriter
+from bs4 import BeautifulSoup  # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
+import xlsxwriter  # https://xlsxwriter.readthedocs.io/index.html
 # My modules
-import toolbox
-import grave_digger
-
-# --- Functions. ---
+import toolbox  # https://github.com/doug-foster/find-a-grave-scraper
+import grave_digger  # https://github.com/doug-foster/find-a-grave-scraper
 
 # --- Globals. ---
 path_to_stash = 'stash/'
 path_to_output = 'output/'
+all_cells = 'A1:XFD1048576'
+fag_prefix = 'https://www.findagrave.com/memorial/'
+
+# --- Functions. ---
+
+# --- Start. ---
+toolbox.print_l('\nStarted script @ ' + time.strftime('%Y%m%d-%H%M%S') + '.')
 
 # --- Get digging instructions. ---
 instructions = grave_digger.dig_instructions()
 
-# --- Start. ---
-toolbox.print_l('Started script @ ' + time.strftime('%Y%m%d-%H%M%S') + '.')
-
 # --- Create workbook. ---
-workbook = xlsxwriter.Workbook(path_to_output + 'burials.xlsx')  # Create workbook.
-worksheet = workbook.add_worksheet()  # Add aworksheet.
+workbook_name = path_to_output + 'burials.xlsx'
+workbook = xlsxwriter.Workbook(workbook_name)
+workbook.set_size(1200, 800)
 
-# --- Create cell formats. ---
-bold = workbook.add_format({'bold': 1}) # Highlight bold.
+# --- Create formats. ---
+format_bold = workbook.add_format({'bold': 1})
+format_text = workbook.add_format({'num_format': '@'})
+format_wrap = workbook.add_format({'text_wrap': True})
+format_red = workbook.add_format({'font_color': 'red'})
 
-# --- Digging instructions. ---
-cemetery_ids = []
-cemetery_groups = []
-cemetery_folders = []
-burial_folders = []
-burial_lists = []
-burials = []
-fag_prefix = 'https://www.findagrave.com/memorial/'
-lines = []
+# --- Loop cemeteries. ---
+for cemetery_id, groups in instructions.items() :
 
-for cemetery_id, groups in instructions.items() : # Loop cemeteries.
-	cemetery_ids.append(cemetery_id)
-	cemetery_groups += groups
+	# --- Get cemetery folder. ---
 	cemetery_folder = glob.glob(path_to_stash + '/' + cemetery_id + '*_*/')[0]
-	# Does cemetery folder exit?
-	if not os.path.exists(cemetery_folder) :
+	if not os.path.exists(cemetery_folder) :  # Does folder exit?
 		toolbox.print_l('Error: Folder for cemetery id="' + cemetery_id +
 			'" does not exist.')
 		quit()
-	cemetery_folders.append(cemetery_folder)
+
+	# --- Get burial folder. ---
 	burial_folder = cemetery_folder + cemetery_id + '_burials'
-	# Does burials folder exit?
-	if not os.path.exists(burial_folder) :
+	if not os.path.exists(burial_folder) :  # Does folder exit?
 		toolbox.print_l('Error: Burial folder for cemetery id="' + 
 			cemetery_id + '" does not exist.')
 		quit()
-	burial_folders.append(burial_folder)
+
+	# --- Get burial list. ---
 	burial_list = burial_folder + '_list.txt'
-	# Does burials list file exit?
-	if not os.path.exists(burial_list) :
+	if not os.path.exists(burial_list) :  # Does list exit?
 		toolbox.print_l('Error: Burial list for cemetery id="' + 
 			cemetery_id + '" does not exist.')
 		quit()
-	# Read burials from burial list file.
+
+	# --- Build a list of burials. ---
+	burials = []
+	lines = []
 	f = open(burial_list, 'r')
 	lines += f.read().splitlines()
 	f.close
@@ -90,28 +89,56 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 		line = burial_folder + '/' + line.replace(fag_prefix, '') + '.html'
 		burials.append(line)
 
-# Do the magic. Loop all columns for each row. Write one cell at a time.
-# worksheet.write(row_num, col_num, data, *args)
-num_row = 0
-num_col = 0
-# Write header.
-cols_to_write = grave_digger.dig('', num_row)
-for cell in cols_to_write :  # Loop columns.
-	worksheet.write(num_row, num_col, cell, bold)  # Write header.
-	num_col += 1
-num_row = 1
-# Write data.
-for burial_file_name in burials :
+	# --- Add a cemetery worksheet. ---
+	worksheet_id = workbook.add_worksheet(cemetery_id)
+	worksheet_id.ignore_errors({'number_stored_as_text': all_cells})
+	worksheet_id.freeze_panes(1, 0)
+
+	# --- Write cemetery worksheet header row. ---
+	num_row = 0
 	num_col = 0
-	cols_to_write = grave_digger.dig(burial_file_name, num_row)  # Array of elements to write
+	args = ['', num_row, path_to_stash]
+	cols_to_write = grave_digger.dig(args)  # Get header row.
 	for cell in cols_to_write :  # Loop columns.
-		worksheet.write(num_row, num_col, cell)  # Write data.
+		worksheet_id.write(num_row, num_col, cell, format_bold)  # Write header.
 		num_col += 1
-	num_row += 1
-	if 2 == num_row :
-		break
+	num_row = 1
+	toolbox.print_l()
 
-# --- Close & quit. ---
+	# --- Worksheet data rows. ---
+	for burial_file_name in burials :  # Each row is a burial.
+		num_col = 0
+
+		# Get data row.
+		args = [burial_file_name, num_row, path_to_stash]
+		toolbox.print_l(str(num_row) + ' of ' + str(len(burials)) + ', ', '')
+		toolbox.print_l('Cemetery: ' + cemetery_id + ', ' + ', Memorial: ', '')
+		cols_to_write = grave_digger.dig(args)
+		toolbox.print_l(cols_to_write[2] + ' ', '')
+
+		# Write row data - one column at a time.
+		for cell in cols_to_write :  # Loop columns.
+			toolbox.print_l('.', '')
+			if str == type(cell) :  # Write string.
+				worksheet_id.write(num_row, num_col, cell, format_wrap)
+			elif list == type(cell) and 'url' == cell[0] :  # Write link.
+				# List format is ['url'] [url] [text].
+				url = cell[1]
+				text = cell[2]
+				worksheet_id.write_url(num_row, num_col, url, string=text)
+			num_col += 1
+
+		# Increment row.
+		toolbox.print_l(' !',)
+		num_row += 1
+		# if 8 == num_row :  # Limit # of rows.
+		# 	break
+
+	# --- Wrap up cemetery worksheet. ---
+	grave_digger.adjust_worksheet(worksheet_id)
+
+# --- Finish. ---
 workbook.close()
+toolbox.print_l('Finished script @ ' + time.strftime('%Y%m%d-%H%M%S') + '.')
 
-# --- Test. ---
+# ------------------------------------------------/

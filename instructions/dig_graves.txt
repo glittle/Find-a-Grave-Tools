@@ -1,49 +1,56 @@
-# --------------------------------------------
-# Name:              dig_graves.txt
-# URI:               https://github.com/doug-foster/find-a-grave-scraper
-# Description:	     Instructions file for dig_graves.py
-# Version:		     1.00
-# Requires at least: 3.1
-# Requires Python:   3.12
-# Author:            Doug Foster
-# Author URI:        http://dougfoster.me
-# License:           GPL v3 or later
-# License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-# Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-# Text Domain:       find-a-grave-scraper
+# ------------------------------------------------\
+#  Instructions file for dig_graves.py.
+#  Last update: 2024/06/02 @ 12:45am.
 #
-# Last update: 2024/05/28 @ 10:15am
-# Comments:
-#   dig_graves.py extracts/reports data for a collection of stashed "Find a Grave" memorial pages.
-#   Schema:
-#      log = create a log file
-#      cemetery_id : group, group, ...
-#      cemetery_id = numeric Find a Grave cemetery ID
-#      valid groups = burial, parent, spouse, child, sibling, half-sibling
+#  Name:              dig_graves.txt
+#  URI:               https://github.com/doug-foster/find-a-grave-scraper
+#  Description:	      Instructions file for dig_graves.py
+#  Version:		      1.00
+#  Requires at least: 3.1
+#  Requires Python:   3.12
+#  Author:            Doug Foster
+#  Author URI:        http://dougfoster.me
+#  License:           GPL v3 or later
+#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
+#  Text Domain:       find-a-grave-scraper
+#
+#  dig_graves.py extracts/reports data for a collection of stashed "Find a Grave" memorial pages.
+#
+#  Schema:
+#   log = create a log file
+#   cemetery_id : group, group, ...
+#   cemetery_id = numeric Find a Grave cemetery ID
+#   valid groups = burial, parent, spouse, child, sibling, half-sibling
 #   Colon (:) separates cemetery_id and groups
 #   Comma (,) separates groups
-#   cemetery_id without group(s) will convert to include all groups
-#   For data integrity, if getting all groups, get a fresh copy of all burials.
-#   If "log" appears by itself on a line, start a log file.
-#   Examples:
-#      2136908 : child
-#      2136908 : burial, parent, spouse, child, sibling, half-sibling
-#      2136908 (converts to ...)
-#      2136908 : family (converts to ...)
-#      2136908 : burial, parent, spouse, child, sibling, half-sibling
-# --------------------------------------------
-
-# 2353265 - PRES - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 2243718 - UCC - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 2145876 - SML - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 2136908 - UMC - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 1682503 - IOOF - Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
-# 1676398 - SPP - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   cemetery_id without group(s) will convert to include all groups.
+#
+#  For data integrity, if getting all groups, get a fresh copy of all burials.
+#  If "log" appears by itself on a line, start a log file.
+#
+#  Examples:
+#   2136908 : child
+#   2136908 : burial, parent, spouse, child, sibling, half-sibling
+#   2136908 (converts to ...)
+#   2136908 : family (converts to ...)
+#   2136908 : burial, parent, spouse, child, sibling, half-sibling.
+#
+#  Cemeteries:
+#   2353265 - PRES - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2243718 - UCC - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2145876 - SML - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2136908 - UMC - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   1682503 - IOOF - Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   1676398 - SPP - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA.
+# ------------------------------------------------\
 
 #log
 2353265
-# 2243718
-# 2145876
-# 2136908
-# 1682503
-# 1676398
+2243718
+2145876
+2136908
+1682503
+1676398
+
+# ------------------------------------------------/
