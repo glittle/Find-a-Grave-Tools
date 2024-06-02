@@ -1,7 +1,7 @@
 # Find a Grave scraper
 Pull, stash, extract, analyze, and report data for 'Find a Grave' (https://www.findagrave.com) memorial pages.
 ## Last updated
-2024-05-28
+2024-06-02
 
 ## Background
 These python scripts were created to help Cindy Foster @ iHuntDeadPeople.com with [one of her genealogy research projects](https://ihuntdeadpeople.com/let-us-help-with-your-genealogy-research/).
