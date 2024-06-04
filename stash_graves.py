@@ -65,7 +65,7 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 
 	# --- Cemetery vars. ---
 	soup = BeautifulSoup(request.text, 'html.parser')
-	cemetery_name = soup.find('h1', {'class' : 'bio-name'}).text
+	cemetery_name = grave_digger.soup_find(soup, 'cemetery_name')
 	cemetery_name = cemetery_name.rstrip().lstrip().lower().replace(' ', '-')
 	cemetery_slug = cemetery_id + '_' + cemetery_name
 	path_to_cemetery_folder = path_to_stash + cemetery_slug

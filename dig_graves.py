@@ -21,6 +21,7 @@
 import time  #https://docs.python.org/3/library/time.html
 import os  # https://docs.python.org/3/library/os.html
 import glob  # https://docs.python.org/3/library/glob.html
+import re  # https://docs.python.org/3/library/re.html
 # Packages
 from bs4 import BeautifulSoup  # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 import xlsxwriter  # https://xlsxwriter.readthedocs.io/index.html
@@ -56,6 +57,10 @@ format_red = workbook.add_format({'font_color': 'red'})
 # --- Loop cemeteries. ---
 for cemetery_id, groups in instructions.items() :
 
+	# -- Set cemetery id & abbreviation.
+	cemetery_abrev =  cemetery_id.split('-')[1]  # Cemetery abbreviation.
+	cemetery_id =  cemetery_id.split('-')[0]  # Cemetery id.
+
 	# --- Get cemetery folder. ---
 	cemetery_folder = glob.glob(path_to_stash + '/' + cemetery_id + '*_*/')[0]
 	if not os.path.exists(cemetery_folder) :  # Does folder exit?
@@ -90,7 +95,7 @@ for cemetery_id, groups in instructions.items() :
 		burials.append(line)
 
 	# --- Add a cemetery worksheet. ---
-	worksheet_id = workbook.add_worksheet(cemetery_id)
+	worksheet_id = workbook.add_worksheet(cemetery_abrev)
 	worksheet_id.ignore_errors({'number_stored_as_text': all_cells})
 	worksheet_id.freeze_panes(1, 0)
 

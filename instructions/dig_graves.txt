@@ -19,8 +19,9 @@
 #
 #  Schema:
 #   log = create a log file
-#   cemetery_id : group, group, ...
+#   cemetery_id-nickname : group, group, ...
 #   cemetery_id = numeric Find a Grave cemetery ID
+#   -nickname = cemetery abbreviation for spreadsheet tab name
 #   valid groups = burial, parent, spouse, child, sibling, half-sibling
 #   Colon (:) separates cemetery_id and groups
 #   Comma (,) separates groups
@@ -37,20 +38,20 @@
 #   2136908 : burial, parent, spouse, child, sibling, half-sibling.
 #
 #  Cemeteries:
-#   2353265 - PRES - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   2243718 - UCC - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   2145876 - SML - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   2136908 - UMC - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   1682503 - IOOF - Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   1676398 - SPP - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA.
+#   2353265-PRES - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2243718-UCC - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2145876-SML - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2136908-UMC - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   1682503-IOOF - Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   1676398-SPP - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA.
 # ------------------------------------------------\
 
 # log
-# 2353265
-# 2243718
-# 2145876
-# 2136908
-1682503
-# 1676398
+2353265-PRES
+2243718-UCC
+2145876-SML
+2136908-UMC
+1682503-IOOF
+1676398-SPP
 
 # ------------------------------------------------/

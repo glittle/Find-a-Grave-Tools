@@ -1,6 +1,6 @@
 # ------------------------------------------------\
 #  Specific functions for find-a-grave-tools.
-#  Last update: 2024/06/04 @ 03:15pm.
+#  Last update: 2024/06/04 @ 05:15pm.
 #
 #  Name:               grave_digger.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
@@ -115,7 +115,7 @@ row_data = [
 
 # --------------------------------------------\
 #  Return a dictionary of digging instructions.
-#  Last update: 2024/06/03 @ 08:45am.
+#  Last update: 2024/06/04 @ 05:00pm.
 # --------------------------------------------\
 def dig_instructions() :
 
@@ -137,7 +137,8 @@ def dig_instructions() :
 		if 'log' == this_line[0] :
 			toolbox.log()  # Start logging.
 			continue
-		if not this_line[0].isnumeric() :  # Invalid cemetery #?
+		num = this_line[0].split('-')[0]  # Cemetery abbreviation.
+		if not num.isnumeric() :  # Invalid cemetery #?
 			toolbox.print_l('Error: instructions - cemetery ' + this_line[0] + 
 		 		' is non-numeric.')
 			quit()
@@ -701,7 +702,7 @@ def adjust_worksheet(worksheet) :
 
 # --------------------------------------------\
 #  Use Beautiful Soup library to find data element(s).
-#  Last update: 2024/06/04 @ 03:15pm.
+#  Last update: 2024/06/04 @ 05:15pm.
 # --------------------------------------------\
 def soup_find(soup, what, type='', value='') :
 
@@ -816,10 +817,14 @@ def soup_find(soup, what, type='', value='') :
 			item = soup.find(id='inscriptionValue')
 			if None == item : return ''
 			else : return toolbox.clean_string(str(item))
-		case 'gravesite_details':
+		case 'gravesite_details' :
 			item = soup.find(id='gravesite-details')
 			if None == item : return ''
 			else : return toolbox.clean_string(str(item))
+		case 'cemetery_name' :  # stash_graves.py
+			item = soup.find('h1', {'class' : 'bio-name'})
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
 		case 'by_attr' :
 			cup_of_soup = soup.find(attrs={type: value})
 			return cup_of_soup
