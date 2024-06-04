@@ -1,19 +1,19 @@
 # ------------------------------------------------\
-#  Analyze/report data for https://www.findagrave.com memorial pages.
-#  Last update: 2024/06/02 @ 12:45am.
+#  Extract/report data for "Find a Grave" memorial pages.
+#  Last update: 2024/06/04 @ 10:15am.
 #
-#  Name:              dig_graves.py
-#  URI:               https://github.com/doug-foster/find-a-grave-scraper
-#  Description:	     Analyze/report data for https://www.findagrave.com memorial pages.
-#  Version:		     1.00
-#  Requires at least: 3.1
-#  Requires Python:   3.12
-#  Author:            Doug Foster
-#  Author URI:        http://dougfoster.me
-#  License:           GPL v3 or later
-#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-#  Text Domain:       find-a-grave-scraper
+#  Name:               dig_graves.py
+#  URI:                https://github.com/doug-foster/find-a-grave-tools
+#  Description:	       Extract/report data for "Find a Grave" memorial pages.
+#  Version:            1.1.1
+#  Requires at least:  3.1 Python
+#  Prefers:            3.12 Python
+#  Author:             Doug Foster
+#  Author URI:         http://dougfoster.me
+#  License:            GPL v3 or later
+#  License URI:        https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:         https://github.com/doug-foster/find-a-grave-tools
+#  Text Domain:        find-a-grave-tools
 # ------------------------------------------------\
 
 # --- Import libraries. ---
@@ -25,8 +25,8 @@ import glob  # https://docs.python.org/3/library/glob.html
 from bs4 import BeautifulSoup  # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 import xlsxwriter  # https://xlsxwriter.readthedocs.io/index.html
 # My modules
-import toolbox  # https://github.com/doug-foster/find-a-grave-scraper
-import grave_digger  # https://github.com/doug-foster/find-a-grave-scraper
+import toolbox  # https://github.com/doug-foster/find-a-grave-tools
+import grave_digger  # https://github.com/doug-foster/find-a-grave-tools
 
 # --- Globals. ---
 path_to_stash = 'stash/'
@@ -97,7 +97,7 @@ for cemetery_id, groups in instructions.items() :
 	# --- Write cemetery worksheet header row. ---
 	num_row = 0
 	num_col = 0
-	args = ['', num_row, path_to_stash]
+	args = ['', num_row]
 	cols_to_write = grave_digger.dig(args)  # Get header row.
 	for cell in cols_to_write :  # Loop columns.
 		worksheet_id.write(num_row, num_col, cell, format_bold)  # Write header.

@@ -1,21 +1,21 @@
 # ------------------------------------------------\
 #  Instructions file for stash_graves.py.
-#  Last update: 2024/05/31 @ 08:45am.
+#  Last update: 2024/06/04 @ 10:15am.
 #
-#  Name:              stash_graves.txt
-#  URI:               https://github.com/doug-foster/find-a-grave-scraper
-#  Description:	      Instructions file for dig_graves.py
-#  Version:		      1.00
-#  Requires at least: 3.1
-#  Requires Python:   3.12
-#  Author:            Doug Foster
-#  Author URI:        http://dougfoster.me
-#  License:           GPL v3 or later
-#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-#  Text Domain:       find-a-grave-scraper
+#  Name:               stash_graves.txt
+#  URI:                https://github.com/doug-foster/find-a-grave-tools
+#  Description:	       Instructions file for dig_graves.py
+#  Version:		       1.1.1
+#  Requires at least:  3.1 Python
+#  Prefers:            3.12 Python
+#  Author:             Doug Foster
+#  Author URI:         http://dougfoster.me
+#  License:            GPL v3 or later
+#  License URI:        https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:         https://github.com/doug-foster/find-a-grave-tools
+#  Text Domain:        find-a-grave-tools
 #
-#  stash_graves.py rerieves & saves "Find a Grave" memorial pages for a cemetery.
+#  stash_graves.py creates a local stash of "Find a Grave" memorial pages for a cemetery.
 #
 #  Schema:
 #   log = create a log file

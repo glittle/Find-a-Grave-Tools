@@ -1,19 +1,19 @@
 # ------------------------------------------------\
-#  Create a local stash of https://www.findagrave.com memorial pages.
-#  Last update: 2024/05/31 @ 09:45am.
+#  Create a local stash of "Find a Grave" memorial pages.
+#  Last update: 2024/06/04 @ 10:15am.
 #
-#  Name:              stash_graves.py
-#  URI:               https://github.com/doug-foster/find-a-grave-scraper
-#  Description:	      Create a local stash of Find a Grave memorial pages
-#  Version:		      1.00
-#  Requires at least: 3.1
-#  Requires Python:   3.12
-#  Author:            Doug Foster
-#  Author URI:        http://dougfoster.me
-#  License:           GPL v3 or later
-#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-#  Text Domain:       find-a-grave-scraper
+#  Name:               stash_graves.py
+#  URI:                https://github.com/doug-foster/find-a-grave-tools
+#  Description:	       Create a local stash of "Find a Grave" memorial pages
+#  Version:            1.1.1
+#  Requires at least:  3.1 Python
+#  Prefers:            3.12 Python
+#  Author:             Doug Foster
+#  Author URI:         http://dougfoster.me
+#  License:            GPL v3 or later
+#  License URI:        https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:         https://github.com/doug-foster/find-a-grave-tools
+#  Text Domain:        find-a-grave-tools
 # ------------------------------------------------\
 
 # --- Import libraries. ---
@@ -25,8 +25,8 @@ import shutil  # https://docs.python.org/3/library/shutil.html
 import requests  # https://pypi.org/project/requests/
 from bs4 import BeautifulSoup  # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 # My modules
-import toolbox  # https://github.com/doug-foster/find-a-grave-scraper
-import grave_digger  # https://github.com/doug-foster/find-a-grave-scraper
+import toolbox  # https://github.com/doug-foster/find-a-grave-tools
+import grave_digger  # https://github.com/doug-foster/find-a-grave-tools
 
 # --- Globals. ---
 path_to_stash = 'stash/'

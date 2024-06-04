@@ -1,19 +1,19 @@
 # ------------------------------------------------\
 #  Instructions file for dig_graves.py.
-#  Last update: 2024/06/02 @ 12:45am.
+#  Last update: 2024/06/04 @ 10:15am.
 #
-#  Name:              dig_graves.txt
-#  URI:               https://github.com/doug-foster/find-a-grave-scraper
-#  Description:	      Instructions file for dig_graves.py
-#  Version:		      1.00
-#  Requires at least: 3.1
-#  Requires Python:   3.12
-#  Author:            Doug Foster
-#  Author URI:        http://dougfoster.me
-#  License:           GPL v3 or later
-#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-#  Text Domain:       find-a-grave-scraper
+#  Name:               dig_graves.txt
+#  URI:                https://github.com/doug-foster/find-a-grave-tools
+#  Description:	       Instructions file for dig_graves.py
+#  Version:		       1.1.1
+#  Requires at least:  3.1 Python
+#  Prefers:            3.12 Python
+#  Author:             Doug Foster
+#  Author URI:         http://dougfoster.me
+#  License:            GPL v3 or later
+#  License URI:        https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:         https://github.com/doug-foster/find-a-grave-tools
+#  Text Domain:        find-a-grave-tools
 #
 #  dig_graves.py extracts/reports data for a collection of stashed "Find a Grave" memorial pages.
 #
@@ -45,12 +45,12 @@
 #   1676398 - SPP - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA.
 # ------------------------------------------------\
 
-#log
-2353265
-2243718
-2145876
-2136908
+# log
+# 2353265
+# 2243718
+# 2145876
+# 2136908
 1682503
-1676398
+# 1676398
 
 # ------------------------------------------------/

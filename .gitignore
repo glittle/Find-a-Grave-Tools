@@ -1,6 +1,6 @@
-output/*
 scratch
+output/*
 logs/*
 stash/*
 __pycach*
-find-a-grave-scraper.code-workspace
+find-a-grave-tools.code-workspace

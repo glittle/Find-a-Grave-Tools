@@ -1,19 +1,19 @@
 # ------------------------------------------------\
-#  Specific functions for find-a-grave-scraper.
-#  Last update: 2024/06/02 @ 12:45am.
+#  Specific functions for find-a-grave-tools.
+#  Last update: 2024/06/04 @ 03:15pm.
 #
-#  Name:              grave_digger.py
-#  URI:               https://github.com/doug-foster/find-a-grave-scraper
-#  Description:	      Specific functions for find-a-grave-scraper
-#  Version:		      1.00
-#  Requires at least: 3.1
-#  Requires Python:   3.12
-#  Author:            Doug Foster
-#  Author URI:        http://dougfoster.me
-#  License:           GPL v3 or later
-#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-#  Text Domain:       find-a-grave-scraper
+#  Name:               grave_digger.py
+#  URI:                https://github.com/doug-foster/find-a-grave-tools
+#  Description:	       Specific functions for find-a-grave-tools
+#  Version:		       1.1.1
+#  Requires at least:  3.1 Python
+#  Prefers:            3.12 Python
+#  Author:             Doug Foster
+#  Author URI:         http://dougfoster.me
+#  License:            GPL v3 or later
+#  License URI:        https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:         https://github.com/doug-foster/find-a-grave-tools
+#  Text Domain:        find-a-grave-tool
 # ------------------------------------------------\
 
 # --- Import libraries. ---
@@ -22,10 +22,11 @@ import os  # https://docs.python.org/3/library/os.html
 import glob  # https://docs.python.org/3/library/glob.html
 import re  # https://docs.python.org/3/library/re.html
 import inspect  # https://docs.python.org/3/library/inspect.html
+from urllib.parse import unquote  # https://docs.python.org/3/library/urllib.html
 # Packages.
 from bs4 import BeautifulSoup  # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 # My modules.
-import toolbox  # https://github.com/doug-foster/find-a-grave-scraper
+import toolbox  # https://github.com/doug-foster/find-a-grave-tools
 
 # --- Globals. ---
 find_a_grave = 'https://www.findagrave.com'
@@ -40,13 +41,6 @@ master_list = 'master_list.txt'
 lat_long = None
 cemetery_folders = []
 g_map = ''
-cemetery_abreviation = {
-	2353265 : 'PRES', # Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
-	2243718 : 'UCC',  # Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
-	2145876 : 'SML',  # Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
-	1682503 : 'IOOF', # Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
-	1676398 : 'SPP'   # Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
-}
 cemetery = ['cemetery', 'Cemetery']
 surname = ['surname', 'Surname']
 name = ['name', 'Name']
@@ -104,24 +98,24 @@ row_data = [
 # --- Functions. ---
 # dig_instructions()
 # find_burial_urls(args)
-# find_family_urls(group, this_soup)
+# find_family_urls(group, soup)
 # stash_group_page(args)
 # pause_digging()
 # build_master_list(path_to_stash)
 # save_master_list(path_to_stash)
 # dig(args)
 # dig_this(args)
-# get_by_script_var_value(var_id, vars)
-# get_by_attr(attr_type, attr_value, this_soup, type='text')
-# get_by_group_label(label, this_soup, type='text')
+# get_by_group(soup, group)
 # build_link(url, text)
 # lat_long(which, gmap_url='')
 # adjust_worksheet(worksheet)
-# get_surname()
+# soup_find(soup, what, type, value=)
+# parent_surname(soup, mem_url)
+
 
 # --------------------------------------------\
 #  Return a dictionary of digging instructions.
-#  Last update: 2024/05/28 @ 04:15pm.
+#  Last update: 2024/06/03 @ 08:45am.
 # --------------------------------------------\
 def dig_instructions() :
 
@@ -183,7 +177,7 @@ def dig_instructions() :
 
 # --------------------------------------------\
 #  Search cemetery index page(s) for memorial urls.
-#  Last update: 2024/05/28 @ 10:30am.
+#  Last update: 2024/06/03 @ 08:45am.
 #
 #  Sister function is find_family_urls().
 #  Build an list file, return an array.
@@ -199,7 +193,7 @@ def find_burial_urls(args) :
 	page = 1
 	loop = True
 	memorial_urls = []
-	toolbox.print_l()
+	# toolbox.print_l()
 
 	# --- Create group list. ---
 	f = open(path_to_list[group], 'w')
@@ -223,7 +217,7 @@ def find_burial_urls(args) :
 
 		# --- If last page, stop looping. ---
 		# Search page tags for warnings.
-		warnings = soup.find_all('span', {'class' : 'icon-warning'})
+		warnings = soup_find(soup, 'warnings')
 		for warning in warnings :  # Loop warnings.
 			# No more pages?
 			if warning.parent.text.lower().find('no matches found') > 0 :
@@ -236,7 +230,7 @@ def find_burial_urls(args) :
 		toolbox.print_l('Pulling "' + group + '" links from index ' + 
 			cemetery_index_page)
 		# Search page for memorial items.
-		memorials = soup.find_all('div', {'class' : 'memorial-item'})
+		memorials = soup_find(soup, 'memorials')
 		# URL format: "https://www.findagrave.com/memorial/84600372/albert-mike-albrecht"
 
 		# --- Loop memorial pages. ---
@@ -264,37 +258,26 @@ def find_burial_urls(args) :
 
 # --------------------------------------------\
 #  Search memorial page soup for group (aka family) memorial URLs.
-#  Last update: 2024/05/28 @ 10:30am.
+#  Last update: 2024/06/03 @ 08:45am.
 #
 #  Sister function is find_burial_urls().
 #  Return an array of memorial URLs.
+#  Used by stash_graves.py.
+#  NOT used by dig_graves.py.
 # --------------------------------------------\
-def find_family_urls(group, this_soup) :
+def find_family_urls(group, soup) :
 
 	# --- Vars. ---
 	family_urls = []
 
 	# --- Check input. ---
-	if 'this_soup' not in locals():
+	if 'soup' not in locals():
 		toolbox.print_l('Error: no Soup.')
 		return False
 
 	# --- Set element label for this group. ---
-	match group:
-		case 'parent':
-			family = this_soup.find(id='parentsLabel')
-		case 'spouse':
-			family = this_soup.find(id='spouseLabel')
-		case 'child':
-			family = this_soup.find(id='childrenLabel')
-		case 'sibling':
-			family = this_soup.find(id='siblingLabel')
-		case 'half-sibling':
-			family = this_soup.find(id='halfSibLabel')
-		case '' :
-			toolbox.print_l('Error: no group.')
-			return False
-	if None == family : return ''
+	family = soup_find(soup, group)
+	if 0 == len(family) : return ''
 	
 	# --- Find element in soup. ---
 	family_links = family.parent.find_all('a')
@@ -308,7 +291,7 @@ def find_family_urls(group, this_soup) :
 
 # --------------------------------------------\
 #  Save (aka stash) a group page.
-#  Last update: 2024/05/28 @ 10:30am.
+#  Last update: 2024/06/03 @ 08:45am.
 # --------------------------------------------\
 def stash_group_page(args) :
 
@@ -356,7 +339,7 @@ def stash_group_page(args) :
 
 # --------------------------------------------\
 #  Random sleep when requesting web pages.
-#  Last update: 2024/05/28 @ 10:30am.
+#  Last update: 2024/06/03 @ 08:45am.
 # --------------------------------------------\
 def pause_digging() :
 
@@ -367,7 +350,7 @@ def pause_digging() :
 
 # --------------------------------------------\
 #  Prevent duplicating stashed pages.
-#  Last update: 2024/05/28 @ 01:30pm.
+#  Last update: 2024/06/03 @ 08:45am.
 #
 #  Create a list of all URLs for all cemeteries in this collection
 #  1. For "path_to_stash" (aka collection), find all cemetery folders
@@ -401,7 +384,7 @@ def build_master_list(path_to_stash) :
 
 # --------------------------------------------\
 #  Write master list of URLs.
-#  Last update: 2024/05/27 @ 12:00pm
+#  Last update: 2024/06/03 @ 08:45am.
 # --------------------------------------------\
 def save_master_list(path_to_stash) :
 
@@ -415,14 +398,13 @@ def save_master_list(path_to_stash) :
 
 # --------------------------------------------\
 #  Build a burial row for the output spreadsheet.
-#  Last update: 2024/05/29 @ 04:30pm.
+#  Last update: 2024/06/03 @ 08:45am.
 # --------------------------------------------\
 def dig(args) :
 
 	# --- Vars. ---
 	burial_file_name = args[0]
 	num_row = args[1]
-	path_to_stash = args[2]
 	cols_to_write = []
 
 	# --- Fill the row. ---
@@ -438,7 +420,7 @@ def dig(args) :
 		f.close
 		# Loop columns. Position [index][0] is switch match for dig_this()).
 		for index in range(len(row_data)) :
-			args = [soup, row_data[index][0], path_to_stash]
+			args = [soup, row_data[index][0]]
 			element = dig_this(args)
 			cols_to_write.append(element)
 
@@ -448,92 +430,111 @@ def dig(args) :
 
 # --------------------------------------------\
 #  Use Beautiful Soup library to find a data element.
-#  Last update: 2024/06/02 @ 12:30am.
+#  Last update: 2024/06/03 @ 12:30pm.
 # --------------------------------------------\
 def dig_this(args) :
 
 	# --- Vars. ---
-	this_soup = args[0]
+	soup = args[0]
 	element = args[1]
-	path_to_stash = args[2]
 	cell_value = ''
+	element_value = ''
 	global lat_long
 	global g_map
 
 	# --- Check input. ---
-	if 'this_soup' not in locals():
+	if 'soup' not in locals():
 		toolbox.print_l('Error: no Soup.')
 		return False
-
-	# --- Find the script element which sets lots of vars. ---
-	scripts = this_soup.find_all('script')
-	for script in scripts :
-		if script.string :
-			if -1 != script.string.find('memorialCemeteryId') :
-				script_vars = script.string.split('\n')
-	if None == script_vars :
-		toolbox.print_l('Error: no script vars (memorialCemeteryId)')
 
 	# --- Find data value. ---
 	match element:
 		case 'cemetery':
-			cemetery_id = get_by_script_var_value('memorialCemeteryId', \
-										 script_vars)
-			url = find_a_grave + '/cemetery/' + cemetery_id
-			cell_value = build_link(url, cemetery_id)
+			cemetery_url = soup_find(soup, 'cemetery')
+			cemetery_id = cemetery_url.split('/')[2]
+			full_url = find_a_grave + cemetery_url
+			element_value = build_link(full_url, cemetery_id)
+			cell_value = element_value
 		case 'surname':
-			cell_value = get_by_script_var_value('lastName', script_vars)
+			mem_url = soup_find(soup, 'mem_url')
+			parts = mem_url.split('/')
+			this_name_string = parts[len(parts)-1]
+			parts = re.split('-|_', this_name_string)  # Delimiter could be '-' or '_'.
+			element_value = unquote(parts[len(parts)-1].capitalize())
+			cell_value = element_value
 		case 'name':
-			cell_value = get_by_script_var_value('fullName', script_vars)
+			element_value = soup_find(soup, 'full_name')
+			cell_value = element_value
 		case 'id':
-			memorial_id = get_by_script_var_value('memorialId', script_vars)
-			url = find_a_grave + '/memorial/' + memorial_id
-			cell_value = build_link(url, memorial_id)
+			memorial_id = soup_find(soup, 'mem_id')
+			full_url = find_a_grave + '/memorial/' + memorial_id
+			element_value = build_link(full_url, memorial_id)
+			cell_value = element_value
 		case 'birth':
-			cell_value = get_by_attr('id','birthDateLabel', this_soup)
+			element_value = soup_find(soup, 'birth')
+			cell_value = element_value
 		case 'birth_location':
-			cell_value = get_by_attr('itemprop','birthPlace', this_soup)
+			element_value = soup_find(soup, 'birth_location')
+			cell_value = element_value
 		case 'death':
-			cell_value = get_by_script_var_value('deathDate', script_vars)
+			element_value = soup_find(soup, 'death')
+			cell_value = element_value
 		case 'death_location':
-			cell_value = get_by_attr('itemprop','deathPlace', this_soup)
+			element_value = soup_find(soup, 'death_location')
+			cell_value = element_value
 		case 'parents_surname':
-			cell_value = get_surname(this_soup, script_vars)
+			mem_url = soup_find(soup, 'mem_url')
+			element_value = parent_surname(soup, mem_url)
+			cell_value = element_value
 		case 'parents':
-			cell_value = get_by_group_label('parentsLabel', this_soup)
+			element_value = get_by_group(soup, 'parents')
+			cell_value = element_value
 		case 'father':
-			cell_value = get_by_group_label('parentsLabel', this_soup, \
-				type='father')
+			element_value = get_by_group(soup, 'father')
+			cell_value = element_value
 		case 'mother':
-			cell_value = get_by_group_label('parentsLabel', this_soup, \
-				type='mother')
+			element_value = get_by_group(soup, 'mother')
+			cell_value = element_value
 		case 'spouses':
-			cell_value = get_by_group_label('spouseLabel', this_soup)
+			element_value = get_by_group(soup, 'spouses')
+			cell_value = element_value
 		case 'children':
-			cell_value = get_by_group_label('childrenLabel', this_soup)
+			element_value = get_by_group(soup, 'children')
+			cell_value = element_value
 		case 'siblings':
-			cell_value = get_by_group_label('siblingLabel', this_soup)
-		case 'half-siblings':
-			cell_value = get_by_group_label('halfSibLabel', this_soup)
+			element_value = get_by_group(soup, 'siblings')
+			cell_value = element_value
+		case 'half_siblings':
+			element_value = get_by_group(soup, 'half-siblings')
+			cell_value = element_value
 		case 'veteran':
-			cell_value = get_by_attr('-','-', this_soup, 'vet')
+			element_value = soup_find(soup, 'veteran')
+			cell_value = element_value
 		case 'cenotaph':
-			cell_value = get_by_script_var_value('isCenotaph', script_vars)
+			element_value = soup_find(soup, 'cenotaph')
+			cell_value = element_value
 		case 'plot':
-			cell_value = get_by_attr('id','plotValueLabel', this_soup)
+			element_value = soup_find(soup, 'plot')
+			cell_value = element_value
 		case 'bio':
-			cell_value = get_by_attr('id','partBio', this_soup)
+			element_value = soup_find(soup, 'bio')
+			cell_value = element_value
 		case 'google_map':
-			g_map = get_by_attr('id','gpsValue', this_soup, 'soup').attrs['href']
-			cell_value = build_link(g_map, 'map')
+			g_map = soup_find(soup, 'google_map')
+			element_value = build_link(g_map, 'map')
+			cell_value = element_value
 		case 'latitude':
-			cell_value = lat_long('lat', g_map)
+			element_value = lat_long('lat', g_map)
+			cell_value = element_value
 		case 'longitude':
-			cell_value = lat_long('long', g_map)
+			element_value = lat_long('long', g_map)
+			cell_value = element_value
 		case 'inscription':
-			cell_value = get_by_attr('id','inscriptionValue', this_soup)
+			element_value = soup_find(soup, 'inscription')
+			cell_value = element_value
 		case 'gravesite_details':
-			cell_value = get_by_attr('id', 'gravesite-details', this_soup)
+			element_value = soup_find(soup, 'gravesite-details')
+			cell_value = element_value
 		case '' :
 			toolbox.print_l('Error: no group.')
 			cell_value = ''
@@ -542,161 +543,93 @@ def dig_this(args) :
 
 
 # --------------------------------------------\
-#  Use Beautiful Soup library to find a data element.
-#  Last update: 2024/06/01 @ 06:45pm.
+#  Create ouput for family groups. 
+#  Last update: 2024/06/04 @ 01:30pm.
 # --------------------------------------------\
-def get_by_script_var_value(var_id, vars) :
+def get_by_group(soup, group, value='') :
 
-	# --- Return var value. ---
-	for var in vars :
-		if var.find(var_id) > 0 :
-			break
-	var = var.split(':')[1]  # Split off the var string.
-	double_quotes = re.search('".*"', var) # Does it use "?
-	single_quotes = re.search('\'.*\'', var) # Does it use '?
-	if None != double_quotes :
-		var = double_quotes.group().replace('"', '').rstrip()
-	if None != single_quotes :
-		var = single_quotes.group().replace('\'', '').replace(' ', '')
-	if var.find('true,') > 0 :
-		var = 'Y'
-	elif var.find('false,') > 0 :
-		var = ''
-	var = toolbox.clean_string(var)
-	return var
-# --------------------------------------------/
-
-
-# --------------------------------------------\
-#  Use Beautiful Soup library to find a data element.
-#  Last update: 2024/06/02 @ 12:45am.
-# --------------------------------------------\
-def get_by_attr(attr_type, attr_value, this_soup, type='text') :
-
-	# --- Vars. ---
-	output = ''
-	before = ''
-
-	if 'vet' == type :
-		vet = this_soup.select('h1 .icon-vet')
-		if len(vet) > 0 : return 'Y'
-		else : return ''
-
-	# --- Find the correct attributes. ---
-	if 'id' == attr_type :
-		target = this_soup.find(id=attr_value)
-	elif 'class' == attr_type :
-		target = this_soup.find(class_=attr_value)
-	else :
-		target = this_soup.find(attrs={attr_type: attr_value})
-	if None == target : return ''
-
-	# --- Return soup object.
-	if 'soup' == type :
-		return target
-	
-	# --- Return output string. ---
-	if 1 == len(target.contents) :  # One element.
-		output = toolbox.clean_string(target.text)
-	else :  # Multiple elements.
-		for i in range(len(target.contents)) :
-			before += str(target.contents[i])
-		# Change html elements to text string.
-		output = toolbox.clean_string(output)
-	return output
-# --------------------------------------------/
-
-
-# --------------------------------------------\
-#  Use Beautiful Soup library to find a multiple elements for a group.
-#  Last update: 2024/06/01 @ 11:30pm.
-# --------------------------------------------\
-def get_by_group_label(label, this_soup, type='text') :
-
-	# --- Vars. ---
-	find_name = '[aria-labelledby="' + label + '"] li [itemprop="name"]'
-	output = ''
-	parent = []
-	parents = []
-
-	# --- Find soup objects with this label. ---
-	people = this_soup.select(find_name)
-	if None == people : return ''
+	# --- Find soup objects by this group. ---
+	match group :
+		case 'parents' :
+			people = soup_find(soup, 'parents')
+		case 'num_parents' :
+			people = soup_find(soup, 'parents')
+		case 'father' :	
+			people = soup_find(soup, 'parents')
+		case 'mother' :
+			people = soup_find(soup, 'parents')
+		case 'spouses' :
+			people = soup_find(soup, 'spouses')
+		case 'children' :
+			people = soup_find(soup, 'children')		
+		case 'siblings' :
+			people = soup_find(soup, 'siblings')
+		case 'half-siblings' :
+			people = soup_find(soup, 'half-siblings')
+	if 0 == len(people) : return ''
 
 	# --- # of parents are used to determine surname.
-	if 'num_parents' == type and 'parentsLabel' == label :
+	if 'num_parents' == group :
 		return (len(people))
 
-	# --- For a family group, set text output. ---
-	# Case scenarios:
-	#  parentsLabel(type='text')
-	#  spouseLabel(type='text')
-	#  childrenLabel(type='text')
-	#  siblingLabel(type='text')
-	#  halfSibLabel(type='text')
-	if 'text' == type :
-		i = 0
+	# --- Loop family group members. ---
+	if 'father' == group or 'mother' == group :
+		parents = []
 		for person in people :
-			# Get/set name.
-			name = toolbox.clean_string(person.text)
-			# Get/set birth date.
-			birth_date = person.parent.find(id="familyBirthLabel")
-			if None == birth_date : birth = ''
-			else : birth = birth_date.text
-			# Get/set death date.
-			death_date = person.parent.find(id="familyDeathLabel")
-			if None == death_date : death = ''
-			else : death = death_date.text
-
-			#  Will always have name, may/not have birth & death.
+			parent = []
+			name = soup_find('', 'person_name', '', person)
+			url = soup_find(soup, 'person_url', '', person)
+			if '' != url : find_a_grave + url
+			parent.append(url)
+			parent.append(name)
+			parents.append(parent)
+	else :
+		output = ''
+		for person in people :
+			name = soup_find('', 'person_name', '', person)
+			birth = soup_find(soup, 'person_birth', '', person)
+			death = soup_find(soup, 'person_death', '', person)
+			#  Will always have a name, may/not have birth & death.
 			if '' != birth and '' != death :
 				output += name + ', ' + birth + ' - ' + death + '\n'
 			elif '' != birth and '' == death :
 				output += name + ', ' + birth + '\n'
 			elif '' == birth and '' != death :
 				output += name + ', ' + birth + '\n'
-		return output[:-1]
 
-	# --- For mother/father, set URL output. ---
-	# Case scenarios:
-	#  parentsLabel(type='father')
-	#  parentsLabel(type='mother')
-
-	# Get name & URL for each parent.
-	for person in people :
-		url = person.parent.parent['data-href']
-		if None == url : url = ''
-		else : url = find_a_grave + url
-		parent.append(url)
-		parent.append(toolbox.clean_string(person.text))
-		parents.append(parent)
-		parent = []
-
-	# Build URL for this parent.
-	match len(parents) :
-		case 0 :  # if no parents, return ''
-			return ''
-		case 1 :  # If one parents, use the same url for both father and mother.
-			return build_link(parents[0][0], parents[0][1])
-		case 2 :  # If two parents, order is always father, mother.
-			if 'father' == type :
+	# --- For a family group, create output. ---
+	if 'father' == group or 'mother' == group :
+		match len(parents) :
+			case 0 :  # if no parents, return ''
+				return ''
+			case 1 :  # If one parents, use the same url for both father and mother.
 				return build_link(parents[0][0], parents[0][1])
-			if 'mother' == type :
-				return build_link(parents[1][0], parents[1][1])
+			case 2 :  # If two parents, order is always father, mother.
+				if 'father' == group :
+					return build_link(parents[0][0], parents[0][1])
+				if 'mother' == group :
+					return build_link(parents[1][0], parents[1][1])
+			case _ : return 'More than two parents.'
+
+	else :
+		return output[:-1]  # Remove last '\n'.		
 # --------------------------------------------/
 
 
 # -------------------------------------------\
 #  Return a list of items to create a hyperlink.
-#  Last update: 2024/05/30 @ 01:00pm.
+#  Last update: 2024/06/04 @ 01:00pm.
 # -------------------------------------------\
 def build_link(url, text) :
 
+	# --- Check input. ---
+	if '' == url :
+		return ''
+	
 	# --- Vars. ---
 	item = []
-	link = [item]
 
-	# --- Return link item list. ---
+	# --- Return item list. ---
 	item.append('url')
 	item.append(url)
 	item.append(text)
@@ -706,7 +639,7 @@ def build_link(url, text) :
 
 # -------------------------------------------\
 #  Return lattitude & longitude from a Google Map URL
-#  Last update: 2024/06/01 @ 07:45pm.
+#  Last update: 2024/06/03 @ 08:45am.
 # -------------------------------------------\
 def lat_long(which, gmap_url='') :
 
@@ -729,7 +662,7 @@ def lat_long(which, gmap_url='') :
 
 # --------------------------------------------\
 #  Final worksheet tweaks
-#  Last update: 2024/06/01 @ 09:00pm.
+#  Last update: 2024/06/03 @ 08:45am.
 # --------------------------------------------\
 def adjust_worksheet(worksheet) :
 	
@@ -767,31 +700,165 @@ def adjust_worksheet(worksheet) :
 
 
 # --------------------------------------------\
-#  Return surname.
-#  Last update: 2024/06/01 @ 09:00pm.
+#  Use Beautiful Soup library to find data element(s).
+#  Last update: 2024/06/04 @ 03:15pm.
 # --------------------------------------------\
-def get_surname(this_soup, script_vars) :
+def soup_find(soup, what, type='', value='') :
 
-	# --- Last names for this person & father. ---
-	this_name = get_by_script_var_value('fullName', script_vars)
-	this_last_name = this_name.rsplit(' ', 1)[1]
-	father_name = get_by_group_label('parentsLabel', this_soup, type='father')
-	if '' == father_name : 
-		father_last_name = ''
-	else :
-		father_last_name = father_name[2].rsplit(' ', 1)[1]
-
-	# Surname based on number of parents.
-	match get_by_group_label('parentsLabel', this_soup, type='num_parents') :
-		case 0:
-			return ''
-		case 1:
-			if this_last_name == father_last_name : return this_last_name
-			else : return ''
-		case 2:
-			return father_last_name
+	match what :
+		case 'warnings' :
+			cup_of_soup = soup.find_all('span', {'class' : 'icon-warning'})
+			if None == cup_of_soup : return ''
+			else : return cup_of_soup
+		case 'memorials' :
+			cup_of_soup = soup.find_all('div', {'class' : 'memorial-item'})
+			if None == cup_of_soup : return ''
+			else : return cup_of_soup
+		case 'cemetery' :
+			item = soup.find(id='cemeteryNameLabel').parent
+			if None == item : return ''
+			else : return item.get('href')
+		case 'full_name' :  # aka surname, name, parents_surname
+			item = soup.find(id='bio-name')
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'mem_url' :
+			item = soup.head.find(attrs={'rel' : 'canonical'})
+			if None == item : return ''
+			else : return item.get('href')
+		case 'mem_id' :  # aka id
+			item = soup.find(id='memNumberLabel')
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'birth' :
+			item = soup.find(id='birthDateLabel')
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'birth_location' :
+			item = soup.find(id='birthLocationLabel')
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'death' :
+			item = soup.find(id='deathDateLabel')
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'death_location' :
+			item = soup.find(id='deathLocationLabel')
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'parents' :
+			label = '[aria-labelledby="parentsLabel"] li [itemprop="name"]'
+			cup_of_soup = soup.select(label)
+			if None == cup_of_soup : return ''
+			return cup_of_soup
+		case 'person_name' :
+			if value == None : return ''
+			else : return toolbox.clean_string(value.text)
+		case 'person_url' :
+			item = value.parent.parent
+			if None == item : return ''
+			else : return item['data-href']
+		case 'person_birth' :
+			item = value.parent.find(id="familyBirthLabel")
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'person_death' :
+			item = value.parent.find(id="familyDeathLabel")
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'spouses' :
+			label = '[aria-labelledby="spouseLabel"] li [itemprop="name"]'
+			cup_of_soup = soup.select(label)
+			if None == cup_of_soup : return ''
+			return cup_of_soup
+		case 'children' :
+			label = '[aria-labelledby="childrenLabel"] li [itemprop="name"]'
+			cup_of_soup = soup.select(label)
+			if None == cup_of_soup : return ''
+			return cup_of_soup
+		case 'siblings' :
+			label = '[aria-labelledby="siblingLabel"] li [itemprop="name"]'
+			cup_of_soup = soup.select(label)
+			if None == cup_of_soup : return ''
+			return cup_of_soup
+		case 'half-siblings' :
+			label = '[aria-labelledby="halfSibLabel"] li [itemprop="name"]'
+			cup_of_soup = soup.select(label)
+			if None == cup_of_soup : return ''
+			return cup_of_soup	
+		case 'veteran' :
+			item = soup.select('h1 .icon-vet')
+			if 0 == len(item) : return ''
+			else : return 'Y'
+		case 'cenotaph' :
+			item = soup.find(id='cemeteryLabel')
+			if None == item : return ''
+			else :
+				value = ''
+				if 'cenotaph' == item.text.lower() : value = 'Y'
+				return value
+		case 'plot' :
+			item = soup.find(id='plotValueLabel')
+			if None == item : return ''
+			else : return toolbox.clean_string(item.text)
+		case 'bio' :
+			item = soup.find(id='partBio')
+			if None == item : return ''
+			else : return toolbox.clean_string(str(item))
+		case 'google_map' :
+			item = soup.find(id='gpsValue')
+			if None == item : return ''
+			else :
+				# Check if no GPS values.
+				if -1 != item.get('href').find('edit#') : return ''
+				else : return item.get('href')
+		case 'inscription':
+			item = soup.find(id='inscriptionValue')
+			if None == item : return ''
+			else : return toolbox.clean_string(str(item))
+		case 'gravesite_details':
+			item = soup.find(id='gravesite-details')
+			if None == item : return ''
+			else : return toolbox.clean_string(str(item))
+		case 'by_attr' :
+			cup_of_soup = soup.find(attrs={type: value})
+			return cup_of_soup
 	return ''
 # --------------------------------------------/
 
-# ------------------------------------------------/
 
+# --------------------------------------------\
+#  Parent surname.
+#  Last update: 2024/06/04 @ 12:15pm.
+# --------------------------------------------\
+def parent_surname(soup, mem_url) :
+
+	# --- Last name for this person. ---
+	parts = mem_url.split('/')
+	this_name_string = parts[len(parts)-1]
+	parts = re.split('-|_', this_name_string)  # Delimiter could be '-' or '_'.
+	this_last_name = parts[len(parts)-1]  # Lower case.
+
+	# --- Last name for this father. ---
+	father = get_by_group(soup, 'father')
+	if '' == father : father_last_name = ''
+	else :
+		father_url = father[1]
+		parts = father_url.split('/')
+		father_name_string = parts[len(parts)-1]
+		parts = re.split('-|_', father_name_string)  # Delimiter could be '-' or '_'.
+		father_last_name = parts[len(parts)-1]  # Lower case.
+
+	# --- Choose surname based on number of parents. ---
+	num_parents = get_by_group(soup, 'num_parents')
+	match num_parents :
+		case 0: return ''
+		case 1:
+			if this_last_name == father_last_name :
+				return unquote(this_last_name.capitalize())
+			else : return ''
+		case 2: return unquote(father_last_name.capitalize())
+		case _: return ''
+# --------------------------------------------/
+
+# ------------------------------------------------/

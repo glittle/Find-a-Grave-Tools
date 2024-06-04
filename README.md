@@ -1,7 +1,8 @@
-# Find a Grave scraper
-Pull, stash, extract, analyze, and report data for 'Find a Grave' (https://www.findagrave.com) memorial pages.
+# Find a Grave Tools
+Create a local stash of "Find a Grave" (https://www.findagrave.com) memorial pages.
+Extract/report data.
 ## Last updated
-2024-06-02
+2024-06-04
 
 ## Background
 These python scripts were created to help Cindy Foster @ iHuntDeadPeople.com with [one of her genealogy research projects](https://ihuntdeadpeople.com/let-us-help-with-your-genealogy-research/).
@@ -13,7 +14,7 @@ You can read more about Cindy and her work at https://ihuntdeadpeople.com/about/
 ## Description
 Unfortunately 'Find a Grave' does not expose a public [API](https://en.wikipedia.org/wiki/API) to programatically extract information. If we want to mine data from the website for a genealogy project, we have to [scrape](https://en.wikipedia.org/wiki/Web_scraping) pages.
 
-Rather than continously hit live website pages for data, pages needed for a project are pulled and then stashed locally. The analysis script(s) use these stashed pages.
+Rather than continously hit live website pages for data, pages needed for a project are pulled once and stashed locally. The analysis script(s) use these stashed pages.
 
 stash_graves.py is used to:
 - PULL specific pages for specifc groups in a collection of cemeteries.
@@ -25,7 +26,6 @@ stash_graves.py is used to:
 dig_graves.py is used to:
 - EXTRACT the data
 	- Leverages the [Beautiful Soup](https://pypi.org/project/beautifulsoup4/) Python package
-- ANALYZE the data
 - REPORT data to a saved Excel spreadsheet
 	- Uses the [XlsxWriter](https://pypi.org/project/XlsxWriter/) Python package
 

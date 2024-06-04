@@ -1,19 +1,19 @@
 # ------------------------------------------------\
-#  Generalized functions for find-a-grave-scraper.
-#  Last update: 2024/06/01 @ 06:00pm.
+#  Generalized functions for find-a-grave-tools.
+#  Last update: 2024/06/04 @ 03:00pm.
 #
-#  Name:              toolbox.py
-#  URI:               https://github.com/doug-foster/find-a-grave-scraper
-#  Description:	     Generalized functions for find-a-grave-scraper
-#  Version:		     1.00
-#  Requires at least: 3.1
-#  Requires Python:   3.12
-#  Author:            Doug Foster
-#  Author URI:        http://dougfoster.me
-#  License:           GPL v3 or later
-#  License URI:       https://www.gnu.org/licenses/agpl-3.0.html
-#  Update URI:        https://github.com/doug-foster/find-a-grave-scraper
-#  Text Domain:       find-a-grave-scraper
+#  Name:               toolbox.py
+#  URI:                https://github.com/doug-foster/find-a-grave-tools
+#  Description:	       Generalized functions for find-a-grave-tools
+#  Version:		       1.1.1
+#  Requires at least:  3.1 Python
+#  Prefers:            3.12 Python
+#  Author:             Doug Foster
+#  Author URI:         http://dougfoster.me
+#  License:            GPL v3 or later
+#  License URI:        https://www.gnu.org/licenses/agpl-3.0.html
+#  Update URI:         https://github.com/doug-foster/find-a-grave-tools
+#  Text Domain:        find-a-grave-tools
 # ------------------------------------------------\
 
 # --- Import libraries. ---
@@ -185,7 +185,7 @@ def get_url(session, url) :
 
 # --------------------------------------------\
 #  Improve the readability of a string.
-#  Last update: 2024/06/01 @ 06:45pm.
+#  Last update: 2024/06/04 @ 03:00pm.
 # --------------------------------------------\
 def clean_string(string) :
 
@@ -202,13 +202,14 @@ def clean_string(string) :
 	string = string.replace('</I>', '')  # 'italics' tags.
 	string = string.replace('<I>', '')  # 'bold' tags.
 	string = string.replace('</I>', '')  # 'bold' tags.
-	string = string.replace('<p>', '')  # Opening 'p' tags.
+	string = re.sub('(<div)(.*?)(>)', '', string)  # Opening 'div' tags.
+	string = string.replace('</div>', '\n')  # Closing 'div' tags.
+	string = re.sub('(<p)(.*?)(>)', '', string)  # Opening 'p' tags.
 	string = string.replace('</p>', '\n')  # Closing 'p' tags.
 	string = string.replace('<br/>', '\n')  # Line breaks.
 	string = string.lstrip().lstrip('\n')  # Beginning of string.
 	string = string.rstrip().rstrip('\n')  # End of string.
-	string = string.replace('\n\n\n', '\n')  # Multiple newlines.
-	string = string.replace('\n\n', '\n')  # Multiple newlines.
+	string = string.replace('\n\n\n', '\n\n')  # Multiple newlines.
 	string = string.replace('   ', ' ')  # Multiple spaces.
 	string = string.replace('  ', ' ')  # Multiple spaces.
 	return string
