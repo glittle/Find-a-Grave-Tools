@@ -5,7 +5,7 @@
 #  Name:               stash_graves.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Create a local stash of "Find a Grave" memorial pages
-#  Version:            1.1.1
+#  Version:            1.2.0
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -33,6 +33,8 @@ path_to_stash = 'stash/'
 burial_urls = []
 master_list_of_urls = []
 cookie_domain = 'www.findagrave.com/'
+this_script = __file__.split('/')
+this_script = this_script[len(this_script)-1]
 
 # --- Functions. ---
 
@@ -186,7 +188,7 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 						# Stash page.
 						grave_digger.stash_group_page(args)
 						# Update family list.
-						f.write(family_url + '\n')
+						f.write(cemetery_id + ', ' + family_url + '\n')
 			this_burial +=1
 
 		# --- Close & tweak group list. ---

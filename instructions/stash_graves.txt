@@ -5,7 +5,7 @@
 #  Name:               stash_graves.txt
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Instructions file for dig_graves.py
-#  Version:		       1.1.1
+#  Version:            1.2.0
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -37,16 +37,16 @@
 #   2136908 : burial, parent, spouse, child, sibling, half-sibling.
 #
 #  Cemeteries:
-#   2353265 - PRES - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   2243718 - UCC - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   2145876 - SML - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   2136908 - UMC - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   1682503 - IOOF - Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
-#   1676398 - SPP - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA.
+#   2353265-PRES - Sherrill Presbyterian Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2243718-UCC - Sherrill United Church of Christ Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2145876-SML - Saint Matthew Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   2136908-UMC - Sherrill United Methodist Church Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   1682503-IOOF - Odd Fellows Cemetery - Sherrill, Dubuque County, Iowa, USA
+#   1676398-SPP - Saints Peter and Paul Cemetery - Sherrill, Dubuque County, Iowa, USA.
 # ------------------------------------------------\
 
 #log
-1682503 : burial, half-sibling
+#1682503 : burial, half-sibling
 # 2136908 : burial
 # 1676398 : parent, spouse, child, sibling, half-sibling
 # 2243718
@@ -54,7 +54,7 @@
 # 1676398
 # 1676398 : sibling
 # 2145876 : sibling, half-sibling
-# 353265 : half-sibling
+2353265 : half-sibling
 # 2243718 : half-sibling
 
 # ------------------------------------------------/

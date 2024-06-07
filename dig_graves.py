@@ -1,11 +1,11 @@
 # ------------------------------------------------\
 #  Extract/report data for "Find a Grave" memorial pages.
-#  Last update: 2024/06/04 @ 10:15am.
+#  Last update: 2024/06/06 @ 10:30pm.
 #
 #  Name:               dig_graves.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Extract/report data for "Find a Grave" memorial pages.
-#  Version:            1.1.1
+#  Version:            1.2.0
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -53,6 +53,7 @@ format_bold = workbook.add_format({'bold': 1})
 format_text = workbook.add_format({'num_format': '@'})
 format_wrap = workbook.add_format({'text_wrap': True})
 format_red = workbook.add_format({'font_color': 'red'})
+formats = [format_bold, format_text, format_wrap, format_red]
 
 # --- Loop cemeteries. ---
 for cemetery_id, groups in instructions.items() :
@@ -102,7 +103,7 @@ for cemetery_id, groups in instructions.items() :
 	# --- Write cemetery worksheet header row. ---
 	num_row = 0
 	num_col = 0
-	args = ['', num_row]
+	args = ['', num_row, path_to_stash, formats]
 	cols_to_write = grave_digger.dig(args)  # Get header row.
 	for cell in cols_to_write :  # Loop columns.
 		worksheet_id.write(num_row, num_col, cell, format_bold)  # Write header.
@@ -115,22 +116,29 @@ for cemetery_id, groups in instructions.items() :
 		num_col = 0
 
 		# Get data row.
-		args = [burial_file_name, num_row, path_to_stash]
+		args = [burial_file_name, num_row, path_to_stash, formats]
 		toolbox.print_l(str(num_row) + ' of ' + str(len(burials)) + ', ', '')
 		toolbox.print_l('Cemetery: ' + cemetery_id + ', ' + ', Memorial: ', '')
 		cols_to_write = grave_digger.dig(args)
-		toolbox.print_l(cols_to_write[2] + ' ', '')
-
+		rich_list = cols_to_write[2][1]  # Log name.
+		full_name = rich_list[len(rich_list)-1]
+		cols_to_write[2][1].remove(full_name)
+		toolbox.print_l(full_name + ' ', '')
 		# Write row data - one column at a time.
 		for cell in cols_to_write :  # Loop columns.
 			toolbox.print_l('.', '')
-			if str == type(cell) :  # Write string.
+			# Write string.
+			if str == type(cell) :
 				worksheet_id.write(num_row, num_col, cell, format_wrap)
-			elif list == type(cell) and 'url' == cell[0] :  # Write link.
-				# List format is ['url'] [url] [text].
+			elif list == type(cell) and 'url' == cell[0] :
+				# Write link (list format is ['url'] [url] [text]).
 				url = cell[1]
 				text = cell[2]
 				worksheet_id.write_url(num_row, num_col, url, string=text)
+			elif list == type(cell) and 'rich_name' == cell[0] :
+				# Write rich string
+				worksheet_id.write_rich_string(num_row, num_col, *cell[1], 
+					format_wrap)
 			num_col += 1
 
 		# Increment row.

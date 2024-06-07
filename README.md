@@ -2,7 +2,7 @@
 Create a local stash of "Find a Grave" (https://www.findagrave.com) memorial pages.
 Extract/report data.
 ## Last updated
-2024-06-04
+2024-06-07
 
 ## Background
 These python scripts were created to help Cindy Foster @ iHuntDeadPeople.com with [one of her genealogy research projects](https://ihuntdeadpeople.com/let-us-help-with-your-genealogy-research/).

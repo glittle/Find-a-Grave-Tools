@@ -5,7 +5,7 @@
 #  Name:               toolbox.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Generalized functions for find-a-grave-tools
-#  Version:		       1.1.1
+#  Version:            1.2.0
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -185,7 +185,7 @@ def get_url(session, url) :
 
 # --------------------------------------------\
 #  Improve the readability of a string.
-#  Last update: 2024/06/04 @ 03:00pm.
+#  Last update: 2024/06/05 @ 04:15pm.
 # --------------------------------------------\
 def clean_string(string) :
 
@@ -202,6 +202,8 @@ def clean_string(string) :
 	string = string.replace('</I>', '')  # 'italics' tags.
 	string = string.replace('<I>', '')  # 'bold' tags.
 	string = string.replace('</I>', '')  # 'bold' tags.
+	string = string.replace('<strong>', '')  # 'strong' tags.
+	string = string.replace('</strong>', '')  # 'strong' tags.
 	string = re.sub('(<div)(.*?)(>)', '', string)  # Opening 'div' tags.
 	string = string.replace('</div>', '\n')  # Closing 'div' tags.
 	string = re.sub('(<p)(.*?)(>)', '', string)  # Opening 'p' tags.

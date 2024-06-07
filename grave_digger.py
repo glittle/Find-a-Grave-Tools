@@ -1,11 +1,11 @@
 # ------------------------------------------------\
 #  Specific functions for find-a-grave-tools.
-#  Last update: 2024/06/04 @ 05:15pm.
+#  Last update: 2024/06/06 @ 10:30pm.
 #
 #  Name:               grave_digger.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Specific functions for find-a-grave-tools
-#  Version:		       1.1.1
+#  Version:            1.2.0
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -105,17 +105,18 @@ row_data = [
 # save_master_list(path_to_stash)
 # dig(args)
 # dig_this(args)
-# get_by_group(soup, group)
+# get_by_group(soup, group, formats)
 # build_link(url, text)
 # lat_long(which, gmap_url='')
 # adjust_worksheet(worksheet)
 # soup_find(soup, what, type, value=)
-# parent_surname(soup, mem_url)
+# parent_surname(soup, mem_url, formats)
+# bold_last_name(full_name, formats)
 
 
 # --------------------------------------------\
 #  Return a dictionary of digging instructions.
-#  Last update: 2024/06/04 @ 05:00pm.
+#  Last update: 2024/06/04 @ 09:00pm.
 # --------------------------------------------\
 def dig_instructions() :
 
@@ -147,11 +148,11 @@ def dig_instructions() :
 		# e.g. { 1682503 : [group, group] }
 		called_by = inspect.stack()[1].filename.rsplit('/', 1)[1]
 		groups = []
+		check_groups = family_groups_all
 		if len(this_line) > 1 :  # There are one or more group(s)).
 			groups = this_line[1].rstrip(',').split(',')  # Split them.
 		else :  # No groups.
 			groups = family_groups_all
-			check_groups = family_groups_all
 
 		# --- Remove duplicates. ---
 		groups = list(dict.fromkeys(groups))  # Cool, huh?
@@ -399,13 +400,15 @@ def save_master_list(path_to_stash) :
 
 # --------------------------------------------\
 #  Build a burial row for the output spreadsheet.
-#  Last update: 2024/06/03 @ 08:45am.
+#  Last update: 2024/06/06 @ 05:30pm.
 # --------------------------------------------\
 def dig(args) :
 
 	# --- Vars. ---
 	burial_file_name = args[0]
 	num_row = args[1]
+	path_to_stash = args[2]
+	formats = args[3]
 	cols_to_write = []
 
 	# --- Fill the row. ---
@@ -421,7 +424,7 @@ def dig(args) :
 		f.close
 		# Loop columns. Position [index][0] is switch match for dig_this()).
 		for index in range(len(row_data)) :
-			args = [soup, row_data[index][0]]
+			args = [soup, row_data[index][0], formats]
 			element = dig_this(args)
 			cols_to_write.append(element)
 
@@ -431,13 +434,14 @@ def dig(args) :
 
 # --------------------------------------------\
 #  Use Beautiful Soup library to find a data element.
-#  Last update: 2024/06/03 @ 12:30pm.
+#  Last update: 2024/06/06 @ 10:00am.
 # --------------------------------------------\
 def dig_this(args) :
 
 	# --- Vars. ---
 	soup = args[0]
 	element = args[1]
+	formats = args[2]
 	cell_value = ''
 	element_value = ''
 	global lat_long
@@ -464,7 +468,11 @@ def dig_this(args) :
 			element_value = unquote(parts[len(parts)-1].capitalize())
 			cell_value = element_value
 		case 'name':
-			element_value = soup_find(soup, 'full_name')
+			real_name = soup_find(soup, 'full_name')
+			last_name = bold_last_name(real_name, formats)
+			last_name.append(real_name)
+			element_value = ['rich_name']
+			element_value.append(last_name)
 			cell_value = element_value
 		case 'id':
 			memorial_id = soup_find(soup, 'mem_id')
@@ -479,34 +487,36 @@ def dig_this(args) :
 			cell_value = element_value
 		case 'death':
 			element_value = soup_find(soup, 'death')
+			# Remove (aged 9 months), ...
+			element_value = re.sub('[ ][(].*?[)].*', '', element_value)
 			cell_value = element_value
 		case 'death_location':
 			element_value = soup_find(soup, 'death_location')
 			cell_value = element_value
 		case 'parents_surname':
 			mem_url = soup_find(soup, 'mem_url')
-			element_value = parent_surname(soup, mem_url)
+			element_value = parent_surname(soup, mem_url, formats)
 			cell_value = element_value
 		case 'parents':
-			element_value = get_by_group(soup, 'parents')
+			element_value = get_by_group(soup, 'parents', formats)
 			cell_value = element_value
 		case 'father':
-			element_value = get_by_group(soup, 'father')
+			element_value = get_by_group(soup, 'father', formats)
 			cell_value = element_value
 		case 'mother':
-			element_value = get_by_group(soup, 'mother')
+			element_value = get_by_group(soup, 'mother', formats)
 			cell_value = element_value
 		case 'spouses':
-			element_value = get_by_group(soup, 'spouses')
+			element_value = get_by_group(soup, 'spouses', formats)
 			cell_value = element_value
 		case 'children':
-			element_value = get_by_group(soup, 'children')
+			element_value = get_by_group(soup, 'children', formats)
 			cell_value = element_value
 		case 'siblings':
-			element_value = get_by_group(soup, 'siblings')
+			element_value = get_by_group(soup, 'siblings', formats)
 			cell_value = element_value
 		case 'half_siblings':
-			element_value = get_by_group(soup, 'half-siblings')
+			element_value = get_by_group(soup, 'half-siblings', formats)
 			cell_value = element_value
 		case 'veteran':
 			element_value = soup_find(soup, 'veteran')
@@ -545,9 +555,9 @@ def dig_this(args) :
 
 # --------------------------------------------\
 #  Create ouput for family groups. 
-#  Last update: 2024/06/04 @ 01:30pm.
+#  Last update: 2024/06/06 @ 10:45pm.
 # --------------------------------------------\
-def get_by_group(soup, group, value='') :
+def get_by_group(soup, group, formats, value='') :
 
 	# --- Find soup objects by this group. ---
 	match group :
@@ -585,20 +595,26 @@ def get_by_group(soup, group, value='') :
 			parent.append(name)
 			parents.append(parent)
 	else :
-		output = ''
+		# --- Formatted text output. ---
+		output = []
 		for person in people :
 			name = soup_find('', 'person_name', '', person)
 			birth = soup_find(soup, 'person_birth', '', person)
 			death = soup_find(soup, 'person_death', '', person)
+			output += bold_last_name(name, formats)  # Format name.
 			#  Will always have a name, may/not have birth & death.
 			if '' != birth and '' != death :
-				output += name + ', ' + birth + ' - ' + death + '\n'
+				# birth_death = '\', \', ' + birth + ' - ' + death + '\n'
+				birth_death = ', ' + birth + ' - ' + death + '\n'
 			elif '' != birth and '' == death :
-				output += name + ', ' + birth + '\n'
+				birth_death = ', ' + birth + '\n'
 			elif '' == birth and '' != death :
-				output += name + ', ' + birth + '\n'
+				birth_death = ', ' + death + '\n'
+			output.append(birth_death)
+		output[len(output)-1] = output[len(output)-1].rstrip('\n')  # Remove last '\n.	
+		return ['rich_name', output]  # Identify for rich string write.
 
-	# --- For a family group, create output. ---
+	# --- Link output. ---
 	if 'father' == group or 'mother' == group :
 		match len(parents) :
 			case 0 :  # if no parents, return ''
@@ -611,9 +627,7 @@ def get_by_group(soup, group, value='') :
 				if 'mother' == group :
 					return build_link(parents[1][0], parents[1][1])
 			case _ : return 'More than two parents.'
-
-	else :
-		return output[:-1]  # Remove last '\n'.		
+			
 # --------------------------------------------/
 
 
@@ -836,7 +850,7 @@ def soup_find(soup, what, type='', value='') :
 #  Parent surname.
 #  Last update: 2024/06/04 @ 12:15pm.
 # --------------------------------------------\
-def parent_surname(soup, mem_url) :
+def parent_surname(soup, mem_url, formats) :
 
 	# --- Last name for this person. ---
 	parts = mem_url.split('/')
@@ -845,7 +859,7 @@ def parent_surname(soup, mem_url) :
 	this_last_name = parts[len(parts)-1]  # Lower case.
 
 	# --- Last name for this father. ---
-	father = get_by_group(soup, 'father')
+	father = get_by_group(soup, 'father', formats)
 	if '' == father : father_last_name = ''
 	else :
 		father_url = father[1]
@@ -855,7 +869,7 @@ def parent_surname(soup, mem_url) :
 		father_last_name = parts[len(parts)-1]  # Lower case.
 
 	# --- Choose surname based on number of parents. ---
-	num_parents = get_by_group(soup, 'num_parents')
+	num_parents = get_by_group(soup, 'num_parents', formats)
 	match num_parents :
 		case 0: return ''
 		case 1:
@@ -864,6 +878,31 @@ def parent_surname(soup, mem_url) :
 			else : return ''
 		case 2: return unquote(father_last_name.capitalize())
 		case _: return ''
+# --------------------------------------------/
+
+
+# --------------------------------------------\
+#  Create a rich string, bold last word (last name) in name.
+#  Last update: 2024/06/06 @ 10:45pm.
+#
+# https://xlsxwriter.readthedocs.io/worksheet.html#worksheet-write-rich-string
+# burial, parent, spouse, child, sibling, half-sibling
+# --------------------------------------------\
+def bold_last_name(full_name, formats) :
+
+	# --- Vars. ---
+	exceptions = ['jr', 'sr', 'i', 'ii', 'iii', 'iv', 'v', 'vi']
+
+	# --- Last name for this person. ---
+	parts = full_name.split(' ')
+	num_parts = len(parts)
+	if parts[num_parts-1].lower() in exceptions :
+		parts.remove(parts[num_parts-1])
+		num_parts -= 1
+	for i in range(len(parts)-1) :
+		parts[i] += ' '  # Add space back in.
+	parts.insert(num_parts-1, formats[0])  # Insert format before last name.
+	return parts
 # --------------------------------------------/
 
 # ------------------------------------------------/
