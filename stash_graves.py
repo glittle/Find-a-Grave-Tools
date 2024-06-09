@@ -1,11 +1,11 @@
 # ------------------------------------------------\
 #  Create a local stash of "Find a Grave" memorial pages.
-#  Last update: 2024/06/04 @ 10:15am.
+#  Last update: 2024/06/09 @ 05:15pm.
 #
 #  Name:               stash_graves.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Create a local stash of "Find a Grave" memorial pages
-#  Version:            1.2.0
+#  Version:            1.2.1
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -79,14 +79,6 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 			groups.insert(0, 'burial')  # Will need to find burials.
 		time.sleep(1)
 
-	# --- Save cemetery page? ---
-	path_to_cemetery_page = path_to_cemetery_folder + '/' + cemetery_id + \
-		'_page.html'
-	if not os.path.exists(path_to_cemetery_page) :  # Does page exist?
-		f = open(path_to_cemetery_page, 'w')  # Create a new page.
-		f.write(request.text)
-		f.close()
-
 	# --- File & folder path dictionaries. ---
 	path_to_list = {
 		'burial' : path_to_cemetery_folder + '/' + cemetery_id + \
@@ -122,8 +114,8 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 	for group in groups :
 
 		# --- Start group. ---
-		toolbox.print_l('Started group ' + group + ' @ ' + 
-			time.strftime('%Y%m%d-%H%M%S') + '.')
+		start_time = time.strftime('%Y%m%d-%H%M%S')
+		toolbox.print_l('Started group ' + group + ' @ ' + start_time + '.')
 				
 		# --- New group folder & folder list.  ---
 		if os.path.isdir(path_to_folder[group]) :  # Folder exists?
@@ -211,9 +203,13 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 		if list(groups).index(group) < len(groups)-1 :
 			toolbox.pause(10, 15, True)
 
-# --- Done. ---
+# --- Create master index. ---
+grave_digger.build_master_index(path_to_stash)
+
+# --- Wrap up. ---
 toolbox.print_l()  # User status - readability.
-toolbox.print_l('Finished script @ ' + time.strftime('%Y%m%d-%H%M%S') + '.')
+stop_time = time.strftime('%Y%m%d-%H%M%S')
+toolbox.print_l('Finished script @ ' + stop_time + '.')
 toolbox.print_l('Done.')
 
 # ------------------------------------------------\

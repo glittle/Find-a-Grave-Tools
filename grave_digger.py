@@ -1,6 +1,6 @@
 # ------------------------------------------------\
 #  Specific functions for find-a-grave-tools.
-#  Last update: 2024/06/06 @ 10:30pm.
+#  Last update: 2024/06/09 @ 05:30pm.
 #
 #  Name:               grave_digger.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
@@ -38,6 +38,7 @@ family_groups_names = ['burials', 'parents', 'spouses', 'children',
 data_groups_all = ['totals', 'names']
 master_urls = []
 master_list = 'master_list.txt'
+master_index = 'master_index.txt'
 lat_long = None
 cemetery_folders = []
 g_map = ''
@@ -293,7 +294,7 @@ def find_family_urls(group, soup) :
 
 # --------------------------------------------\
 #  Save (aka stash) a group page.
-#  Last update: 2024/06/03 @ 08:45am.
+#  Last update: 2024/06/09 @ 04:00pm.
 # --------------------------------------------\
 def stash_group_page(args) :
 
@@ -395,6 +396,37 @@ def save_master_list(path_to_stash) :
 	for url in master_urls :
 		f.write(url + '\n')
 	f.close()
+# --------------------------------------------/
+
+# --------------------------------------------\
+#  Build a master index of all file names.
+#  Last update: 2024/06/09 @ 04:30pm.
+#
+#  Create an index of all stashed files for all cemeteries in this collection
+#  1. For "path_to_stash" (aka collection), find all cemetery folders
+#  2. Combine all group file names from all cemetery folders into a master index 
+#  3. Master index is a snapshot of all file names at _this_ point in time
+#  4. Master index parallels master list created by build_master_list().
+# --------------------------------------------\
+def build_master_index(path_to_stash) :
+
+	# --- Define vars. ---
+	cemetery_folders = glob.glob(path_to_stash + '/*_*/')
+	f = open(path_to_stash + master_index, 'w')
+
+	# --- Build a master index of all group file names. ---
+	for cemetery_folder in cemetery_folders :
+		cemetery_id = cemetery_folder.split(path_to_stash)[1].split('_')[0]
+		for group_name in family_groups_names :
+			path_to_group_folder = cemetery_folder + cemetery_id + '_' + group_name
+			if os.path.exists(path_to_group_folder) :  # Does folder exist?
+				file_names = glob.glob(path_to_group_folder + '/*')
+				for file_name in file_names :
+					f.write(file_name + '\n')
+	f.close()
+	
+	# Remove dangling "\n".
+	toolbox.remove_last_byte(f, path_to_stash + master_index)
 # --------------------------------------------/
 
 
