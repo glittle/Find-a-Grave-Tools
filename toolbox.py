@@ -185,7 +185,7 @@ def get_url(session, url) :
 
 # --------------------------------------------\
 #  Improve the readability of a string.
-#  Last update: 2024/06/05 @ 04:15pm.
+#  Last update: 2024/06/10 @ 02:45pm.
 # --------------------------------------------\
 def clean_string(string) :
 
@@ -212,8 +212,8 @@ def clean_string(string) :
 	string = string.lstrip().lstrip('\n')  # Beginning of string.
 	string = string.rstrip().rstrip('\n')  # End of string.
 	string = string.replace('\n\n\n', '\n\n')  # Multiple newlines.
-	string = string.replace('   ', ' ')  # Multiple spaces.
-	string = string.replace('  ', ' ')  # Multiple spaces.
+	string = string.replace('   ', ' ')  # Multiple (3) spaces.
+	string = string.replace('  ', ' ')  # Multiple (2) spaces.
 	return string
 # --------------------------------------------/
 

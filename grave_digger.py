@@ -1,11 +1,11 @@
 # ------------------------------------------------\
 #  Specific functions for find-a-grave-tools.
-#  Last update: 2024/06/09 @ 05:30pm.
+#  Last update: 2024/06/10 @ 05:00pm.
 #
 #  Name:               grave_digger.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Specific functions for find-a-grave-tools
-#  Version:            1.2.0
+#  Version:            1.2.2
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -29,16 +29,21 @@ from bs4 import BeautifulSoup  # https://www.crummy.com/software/BeautifulSoup/b
 import toolbox  # https://github.com/doug-foster/find-a-grave-tools
 
 # --- Globals. ---
+path_to_stash = 'stash/'
+path_to_output = 'output/'
+master_list = 'master_list.txt'
+master_index = 'master_index.txt'
 find_a_grave = 'https://www.findagrave.com'
+fag_prefix = 'https://www.findagrave.com/memorial/'
+cookie_domain = 'www.findagrave.com/'
+master_urls = []
+master_file_index = []
 family_groups = ['parent', 'spouse', 'child', 'sibling', 'half-sibling']
 family_groups_all = family_groups
 family_groups_all.insert(0, 'burial')
 family_groups_names = ['burials', 'parents', 'spouses', 'children', 
 	'siblings', 'half-siblings']
 data_groups_all = ['totals', 'names']
-master_urls = []
-master_list = 'master_list.txt'
-master_index = 'master_index.txt'
 lat_long = None
 cemetery_folders = []
 g_map = ''
@@ -102,8 +107,10 @@ row_data = [
 # find_family_urls(group, soup)
 # stash_group_page(args)
 # pause_digging()
-# build_master_list(path_to_stash)
-# save_master_list(path_to_stash)
+# build_master_list()
+# save_master_list()
+# build_master_index()
+# read_master_index()
 # dig(args)
 # dig_this(args)
 # get_by_group(soup, group, formats)
@@ -113,7 +120,6 @@ row_data = [
 # soup_find(soup, what, type, value=)
 # parent_surname(soup, mem_url, formats)
 # bold_last_name(full_name, formats)
-
 
 # --------------------------------------------\
 #  Return a dictionary of digging instructions.
@@ -261,7 +267,7 @@ def find_burial_urls(args) :
 
 # --------------------------------------------\
 #  Search memorial page soup for group (aka family) memorial URLs.
-#  Last update: 2024/06/03 @ 08:45am.
+#  Last update: 2024/06/10 @ 12:00pm.
 #
 #  Sister function is find_burial_urls().
 #  Return an array of memorial URLs.
@@ -279,13 +285,22 @@ def find_family_urls(group, soup) :
 		return False
 
 	# --- Set element label for this group. ---
-	family = soup_find(soup, group)
+	match group :
+		case 'parent' :
+			family = soup_find(soup, 'parents')
+		case 'spouse' :
+			family = soup_find(soup, 'spouses')
+		case 'child' :
+			family = soup_find(soup, 'children')		
+		case 'sibling' :
+			family = soup_find(soup, 'siblings')
+		case 'half-sibling' :
+			family = soup_find(soup, 'half-siblings')
 	if 0 == len(family) : return ''
 	
-	# --- Find element in soup. ---
-	family_links = family.parent.find_all('a')
-	for family_link in family_links :
-		family_url = find_a_grave + family_link['href']
+	# --- Find links in soup. ---
+	for member in family :
+		family_url = find_a_grave + soup_find(soup, 'person_url', '', member)
 		family_urls.append(family_url)
 
 	return family_urls
@@ -353,7 +368,7 @@ def pause_digging() :
 
 # --------------------------------------------\
 #  Prevent duplicating stashed pages.
-#  Last update: 2024/06/03 @ 08:45am.
+#  Last update: 2024/06/10 @ 09:00am.
 #
 #  Create a list of all URLs for all cemeteries in this collection
 #  1. For "path_to_stash" (aka collection), find all cemetery folders
@@ -362,7 +377,7 @@ def pause_digging() :
 #
 #  global master_urls[] is master list until saved by write_master_list().
 # --------------------------------------------\
-def build_master_list(path_to_stash) :
+def build_master_list() :
 
 	# --- Define vars. ---
 	global master_urls
@@ -387,9 +402,9 @@ def build_master_list(path_to_stash) :
 
 # --------------------------------------------\
 #  Write master list of URLs.
-#  Last update: 2024/06/03 @ 08:45am.
+#  Last update: 2024/06/10 @ 09:00am.
 # --------------------------------------------\
-def save_master_list(path_to_stash) :
+def save_master_list() :
 
 	# --- Save the master list. --
 	f = open(path_to_stash + master_list, 'w')
@@ -408,7 +423,7 @@ def save_master_list(path_to_stash) :
 #  3. Master index is a snapshot of all file names at _this_ point in time
 #  4. Master index parallels master list created by build_master_list().
 # --------------------------------------------\
-def build_master_index(path_to_stash) :
+def build_master_index() :
 
 	# --- Define vars. ---
 	cemetery_folders = glob.glob(path_to_stash + '/*_*/')
@@ -427,6 +442,26 @@ def build_master_index(path_to_stash) :
 	
 	# Remove dangling "\n".
 	toolbox.remove_last_byte(f, path_to_stash + master_index)
+# --------------------------------------------/
+
+
+# --------------------------------------------\
+#  Read the master file index.
+#  Last update: 2024/06/10 @ 09:00am.
+# --------------------------------------------\
+def read_master_index() :
+
+	# --- Vars. ---
+	global master_file_index
+
+	# --- Read master file index. ---
+	if os.path.exists(path_to_stash + master_index) :  # Does index file exist?
+		f = open(path_to_stash + master_index, 'r')
+		master_file_index = f.readlines()
+		f.close
+	else : 
+		toolbox.print_l('Error: master index file does not exist.')
+		quit()
 # --------------------------------------------/
 
 
@@ -587,7 +622,7 @@ def dig_this(args) :
 
 # --------------------------------------------\
 #  Create ouput for family groups. 
-#  Last update: 2024/06/06 @ 10:45pm.
+#  Last update: 2024/06/10 @ 02:30pm.
 # --------------------------------------------\
 def get_by_group(soup, group, formats, value='') :
 
@@ -615,50 +650,79 @@ def get_by_group(soup, group, formats, value='') :
 	if 'num_parents' == group :
 		return (len(people))
 
-	# --- Loop family group members. ---
-	if 'father' == group or 'mother' == group :
-		parents = []
-		for person in people :
-			parent = []
-			name = soup_find('', 'person_name', '', person)
-			url = soup_find(soup, 'person_url', '', person)
-			if '' != url : find_a_grave + url
-			parent.append(url)
-			parent.append(name)
-			parents.append(parent)
-	else :
-		# --- Formatted text output. ---
-		output = []
-		for person in people :
-			name = soup_find('', 'person_name', '', person)
-			birth = soup_find(soup, 'person_birth', '', person)
-			death = soup_find(soup, 'person_death', '', person)
-			output += bold_last_name(name, formats)  # Format name.
-			#  Will always have a name, may/not have birth & death.
-			if '' != birth and '' != death :
-				# birth_death = '\', \', ' + birth + ' - ' + death + '\n'
-				birth_death = ', ' + birth + ' - ' + death + '\n'
-			elif '' != birth and '' == death :
-				birth_death = ', ' + birth + '\n'
-			elif '' == birth and '' != death :
-				birth_death = ', ' + death + '\n'
-			output.append(birth_death)
-		output[len(output)-1] = output[len(output)-1].rstrip('\n')  # Remove last '\n.	
-		return ['rich_name', output]  # Identify for rich string write.
+	# --- Loop family group members for name & URL. ---
+	members = []
+	for person in people :
+		member = []
+		name = soup_find('', 'person_name', '', person)
+		url = soup_find(soup, 'person_url', '', person)
+		if '' != url : url = find_a_grave + url
+		member.append(url)
+		member.append(name)
+		members.append(member)
+	
+	# --- Formatted text output. ---
+	output = []
+	i = 0
+	for person in people :
+		name = soup_find('', 'person_name', '', person)
+		birth = soup_find(soup, 'person_birth', '', person)
+		death = soup_find(soup, 'person_death', '', person)
 
+		# Get memorial ID.
+		id = members[i][0].split('/')[4]  
+		# Search master file index for ID match.
+		target = '/' + id
+		# files = [x for x in master_file_index if target in x]
+		for file in master_file_index :
+			posn = file.find(target)
+			if -1 != posn :
+				break
+		if -1 == posn :
+			toolbox.print_l('Error: Missing memorial ' + id + 
+				' in master file index.' )
+			cemetery = '** missing **'
+		else :
+			# Make burial soup.
+			file_name = file.split('\n')[0]
+			f = open(file_name, 'r', encoding = 'utf8')
+			this_person_soup  = BeautifulSoup(f, 'html.parser')
+			f.close
+			# Get cemetery ID for this person.
+			cemetery_string = soup_find(this_person_soup, 'cemetery')
+			if '' != cemetery_string :
+				cemetery_string = cemetery_string.split('/cemetery/')[1]
+				cemetery = '#' + cemetery_string.replace('/', '_')
+
+		# Format name.
+		output += bold_last_name(name, formats)
+		#  Will always have a name, may/not have birth & death.
+		if '' != birth and '' != death :
+			etc = ', ' + birth + ' - ' + death + ', ' + cemetery + '\n'
+		elif '' != birth and '' == death :
+			etc = ', ' + birth + ', ' + cemetery + '\n'
+		elif '' == birth and '' != death :
+			etc = ', ' + death + ', ' + cemetery + '\n'
+		output.append(etc)
+		i += 1
+	
 	# --- Link output. ---
 	if 'father' == group or 'mother' == group :
-		match len(parents) :
+		match len(members) :
 			case 0 :  # if no parents, return ''
 				return ''
-			case 1 :  # If one parents, use the same url for both father and mother.
-				return build_link(parents[0][0], parents[0][1])
+			case 1 :  # If one parent, use same url for both father and mother.
+				return build_link(members[0][0], members[0][1])
 			case 2 :  # If two parents, order is always father, mother.
 				if 'father' == group :
-					return build_link(parents[0][0], parents[0][1])
+					return build_link(members[0][0], members[0][1])
 				if 'mother' == group :
-					return build_link(parents[1][0], parents[1][1])
+					return build_link(members[1][0], members[1][1])
 			case _ : return 'More than two parents.'
+
+	# --- Rich name output. ---
+	output[len(output)-1] = output[len(output)-1].rstrip('\n')  # Remove last '\n.
+	return ['rich_name', output]  # Identify for rich string write.
 			
 # --------------------------------------------/
 
@@ -748,7 +812,7 @@ def adjust_worksheet(worksheet) :
 
 # --------------------------------------------\
 #  Use Beautiful Soup library to find data element(s).
-#  Last update: 2024/06/04 @ 05:15pm.
+#  Last update: 2024/06/10 @ 03:00pm.
 # --------------------------------------------\
 def soup_find(soup, what, type='', value='') :
 
@@ -762,13 +826,15 @@ def soup_find(soup, what, type='', value='') :
 			if None == cup_of_soup : return ''
 			else : return cup_of_soup
 		case 'cemetery' :
-			item = soup.find(id='cemeteryNameLabel').parent
+			item = soup.find(id='cemeteryNameLabel')
 			if None == item : return ''
-			else : return item.get('href')
+			else : return item.parent.get('href')
 		case 'full_name' :  # aka surname, name, parents_surname
 			item = soup.find(id='bio-name')
 			if None == item : return ''
-			else : return toolbox.clean_string(item.text)
+			else : 
+				# Remove veteran label.
+				return toolbox.clean_string(item.text.replace('VVeteran', ''))
 		case 'mem_url' :
 			item = soup.head.find(attrs={'rel' : 'canonical'})
 			if None == item : return ''
@@ -936,5 +1002,6 @@ def bold_last_name(full_name, formats) :
 	parts.insert(num_parts-1, formats[0])  # Insert format before last name.
 	return parts
 # --------------------------------------------/
+
 
 # ------------------------------------------------/

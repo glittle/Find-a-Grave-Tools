@@ -1,11 +1,11 @@
 # ------------------------------------------------\
 #  Extract/report data for "Find a Grave" memorial pages.
-#  Last update: 2024/06/06 @ 10:30pm.
+#  Last update: 2024/06/10 @ 03:15pm.
 #
 #  Name:               dig_graves.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Extract/report data for "Find a Grave" memorial pages.
-#  Version:            1.2.0
+#  Version:            1.2.2
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -30,15 +30,19 @@ import toolbox  # https://github.com/doug-foster/find-a-grave-tools
 import grave_digger  # https://github.com/doug-foster/find-a-grave-tools
 
 # --- Globals. ---
-path_to_stash = 'stash/'
-path_to_output = 'output/'
+path_to_stash = grave_digger.path_to_stash
+fag_prefix = grave_digger.fag_prefix
+path_to_output = grave_digger.path_to_output
+master_index = grave_digger.master_index
 all_cells = 'A1:XFD1048576'
-fag_prefix = 'https://www.findagrave.com/memorial/'
 
 # --- Functions. ---
 
 # --- Start. ---
 toolbox.print_l('\nStarted script @ ' + time.strftime('%Y%m%d-%H%M%S') + '.')
+
+# --- Read master file index. ---
+grave_digger.read_master_index()
 
 # --- Get digging instructions. ---
 instructions = grave_digger.dig_instructions()
@@ -118,7 +122,7 @@ for cemetery_id, groups in instructions.items() :
 		# Get data row.
 		args = [burial_file_name, num_row, path_to_stash, formats]
 		toolbox.print_l(str(num_row) + ' of ' + str(len(burials)) + ', ', '')
-		toolbox.print_l('Cemetery: ' + cemetery_id + ', ' + ', Memorial: ', '')
+		toolbox.print_l('Cemetery: ' + cemetery_id + ', Memorial: ', '')
 		cols_to_write = grave_digger.dig(args)
 		rich_list = cols_to_write[2][1]  # Log name.
 		full_name = rich_list[len(rich_list)-1]

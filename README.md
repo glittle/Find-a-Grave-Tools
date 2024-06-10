@@ -2,7 +2,7 @@
 Create a local stash of "Find a Grave" (https://www.findagrave.com) memorial pages.
 Extract/report data.
 ## Last updated
-2024-06-07
+2024-06-10
 
 ## Background
 These python scripts were created to help Cindy Foster @ iHuntDeadPeople.com with [one of her genealogy research projects](https://ihuntdeadpeople.com/let-us-help-with-your-genealogy-research/).
@@ -28,6 +28,14 @@ dig_graves.py is used to:
 	- Leverages the [Beautiful Soup](https://pypi.org/project/beautifulsoup4/) Python package
 - REPORT data to a saved Excel spreadsheet
 	- Uses the [XlsxWriter](https://pypi.org/project/XlsxWriter/) Python package
+
+## Operation
+1. Edit 'instructions/stash_graves.txt' to include the cemeteries and groups to pull from 'Find a Grave'.
+2. Run 'stash_graves.py' to create a local stash of the pages.
+3. Edit 'instructions/dig_graves.txt' to include which cemeteries to pull from the stashed pages.
+4. Run 'dig_graves.py'.
+5. The output spreadsheet will be in 'output/burials.xlsx'.
+6. If you included 'log' as one of the lines in the instruction files, the output will be in 'logs'.
 
 ## Further development
 As mentioned earlier, these scripts were written for a specific project. They are not intended to be an open-source project. Please use them as-is and do not expect on-going support or updates. Hopefully though they will provide you with inspiration for your own versions.

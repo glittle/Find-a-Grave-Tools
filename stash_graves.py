@@ -1,11 +1,11 @@
 # ------------------------------------------------\
 #  Create a local stash of "Find a Grave" memorial pages.
-#  Last update: 2024/06/09 @ 05:15pm.
+#  Last update: 2024/06/10 @ 03:15pm.
 #
 #  Name:               stash_graves.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Create a local stash of "Find a Grave" memorial pages
-#  Version:            1.2.1
+#  Version:            1.2.2
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -29,10 +29,10 @@ import toolbox  # https://github.com/doug-foster/find-a-grave-tools
 import grave_digger  # https://github.com/doug-foster/find-a-grave-tools
 
 # --- Globals. ---
-path_to_stash = 'stash/'
+cookie_domain = grave_digger.cookie_domain
+path_to_stash = grave_digger.path_to_stash
 burial_urls = []
 master_list_of_urls = []
-cookie_domain = 'www.findagrave.com/'
 this_script = __file__.split('/')
 this_script = this_script[len(this_script)-1]
 
@@ -58,6 +58,10 @@ session.cookies.set( "value", "2:", domain=cookie_domain)
 
 # --- Digging instructions. ---
 for cemetery_id, groups in instructions.items() : # Loop cemeteries.
+
+	# -- Set cemetery id & abbreviation.
+	cemetery_abrev =  cemetery_id.split('-')[1]  # Cemetery abbreviation.
+	cemetery_id =  cemetery_id.split('-')[0]  # Cemetery id.
 
 	# --- Check for valid cemetery. ---
 	cemetery_url = 'https://findagrave.com/cemetery/' + cemetery_id
@@ -127,7 +131,7 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 		# --- Build a new master list. ---
 		# Burial group list created in grave_digger.find_burial_urls().
 		# Other group lists created in stash_graves().
-		master_list_of_urls = grave_digger.build_master_list(path_to_stash)
+		master_list_of_urls = grave_digger.build_master_list()
 		time.sleep(1)
 
 		# --- Get "burial" group list. ---
@@ -152,13 +156,14 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 				f = open(path_to_list[group], 'w')  # Open family list file.
 		this_burial = 1
 		for burial_url in burial_urls :  
-			if 'burial' == group :  # Stash "burial" pages.
+			if 'burial' == group :
+				# Stash "burial" page.
 				toolbox.print_l('Saving ' + str(this_burial) + ' of ' + 
 					str(num_burials) + ' "burial" pages - ' + burial_url)
 				args = [session, group, burial_url, '', path_to_folder]
-				# Stash page.
 				grave_digger.stash_group_page(args)
-			else : # Stash family pages.
+			else :
+				# Stash "family" pages.
 				toolbox.print_l(str(this_burial) + ' of ' + str(num_burials) 
 		 			+ ' "burial" pages - ' + burial_url)  # User status.
 				burial_slug = burial_url.split('/memorial/')[1]
@@ -180,7 +185,7 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 						# Stash page.
 						grave_digger.stash_group_page(args)
 						# Update family list.
-						f.write(cemetery_id + ', ' + family_url + '\n')
+						f.write(family_url + '\n')
 			this_burial +=1
 
 		# --- Close & tweak group list. ---
@@ -190,7 +195,7 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 			toolbox.remove_last_byte(f, path_to_list[group])
 
 		# --- Save the new master list. ---
-		grave_digger.save_master_list(path_to_stash)
+		grave_digger.save_master_list()
 
 		# --- Print # of pages in group. ---
 		lines = len(os.listdir(path_to_folder[group]))
@@ -204,7 +209,7 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 			toolbox.pause(10, 15, True)
 
 # --- Create master index. ---
-grave_digger.build_master_index(path_to_stash)
+grave_digger.build_master_index()
 
 # --- Wrap up. ---
 toolbox.print_l()  # User status - readability.

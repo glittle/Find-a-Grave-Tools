@@ -1,11 +1,11 @@
 # ------------------------------------------------\
 #  Instructions file for dig_graves.py.
-#  Last update: 2024/06/04 @ 10:15am.
+#  Last update: 2024/06/10 @ 03:00pm.
 #
 #  Name:               dig_graves.txt
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Instructions file for dig_graves.py
-#  Version:            1.2.0
+#  Version:            1.2.2
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
@@ -27,7 +27,7 @@
 #   Comma (,) separates groups
 #   cemetery_id without group(s) will convert to include all groups.
 #
-#  For data integrity, if getting all groups, get a fresh copy of all burials.
+#  Groups are not currently used by dig_graves.py.
 #  If "log" appears by itself on a line, start a log file.
 #
 #  Examples:
@@ -48,10 +48,10 @@
 
 # log
 2353265-PRES
-#2243718-UCC
-#2145876-SML
-#2136908-UMC
-#1682503-IOOF
-#1676398-SPP
+# 2243718-UCC
+# 2145876-SML
+# 2136908-UMC
+# 1682503-IOOF
+# 1676398-SPP
 
 # ------------------------------------------------/
