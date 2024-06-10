@@ -37,7 +37,7 @@ dig_graves.py is used to:
 5. The output spreadsheet will be in 'output/burials.xlsx'.
 6. If you included 'log' as one of the lines in the instruction files, the output will be in 'logs'.
 
-## Further development
+## bug fixes/Further development
 As mentioned earlier, these scripts were written for a specific project. They are not intended to be an open-source project. Please use them as-is and do not expect on-going support or updates. Hopefully though they will provide you with inspiration for your own versions.
 ## License
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
