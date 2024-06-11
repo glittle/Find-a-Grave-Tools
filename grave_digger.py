@@ -1,6 +1,6 @@
 # ------------------------------------------------\
 #  Specific functions for find-a-grave-tools.
-#  Last update: 2024/06/10 @ 05:00pm.
+#  Last update: 2024/06/10 @ 09:00pm.
 #
 #  Name:               grave_digger.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
@@ -622,7 +622,7 @@ def dig_this(args) :
 
 # --------------------------------------------\
 #  Create ouput for family groups. 
-#  Last update: 2024/06/10 @ 02:30pm.
+#  Last update: 2024/06/10 @ 08:15pm.
 # --------------------------------------------\
 def get_by_group(soup, group, formats, value='') :
 
@@ -667,8 +667,9 @@ def get_by_group(soup, group, formats, value='') :
 	for person in people :
 		name = soup_find('', 'person_name', '', person)
 		birth = soup_find(soup, 'person_birth', '', person)
+		if '' == birth : birth = 'unknown'
 		death = soup_find(soup, 'person_death', '', person)
-
+		if '' == death : death = 'unknown'
 		# Get memorial ID.
 		id = members[i][0].split('/')[4]  
 		# Search master file index for ID match.
@@ -683,6 +684,7 @@ def get_by_group(soup, group, formats, value='') :
 				' in master file index.' )
 			cemetery = '** missing **'
 		else :
+			cemetery = '#unknown'
 			# Make burial soup.
 			file_name = file.split('\n')[0]
 			f = open(file_name, 'r', encoding = 'utf8')
@@ -697,12 +699,7 @@ def get_by_group(soup, group, formats, value='') :
 		# Format name.
 		output += bold_last_name(name, formats)
 		#  Will always have a name, may/not have birth & death.
-		if '' != birth and '' != death :
-			etc = ', ' + birth + ' - ' + death + ', ' + cemetery + '\n'
-		elif '' != birth and '' == death :
-			etc = ', ' + birth + ', ' + cemetery + '\n'
-		elif '' == birth and '' != death :
-			etc = ', ' + death + ', ' + cemetery + '\n'
+		etc = ', ' + birth + ' - ' + death + ', ' + cemetery + '\n'
 		output.append(etc)
 		i += 1
 	

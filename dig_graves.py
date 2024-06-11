@@ -1,11 +1,11 @@
 # ------------------------------------------------\
 #  Extract/report data for "Find a Grave" memorial pages.
-#  Last update: 2024/06/10 @ 03:15pm.
+#  Last update: 2024/06/10 @ 09:00pm.
 #
 #  Name:               dig_graves.py
 #  URI:                https://github.com/doug-foster/find-a-grave-tools
 #  Description:	       Extract/report data for "Find a Grave" memorial pages.
-#  Version:            1.2.2
+#  Version:            1.2.3
 #  Requires at least:  3.1 Python
 #  Prefers:            3.12 Python
 #  Author:             Doug Foster
