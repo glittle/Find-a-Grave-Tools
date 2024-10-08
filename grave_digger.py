@@ -27,10 +27,11 @@ from urllib.parse import unquote  # https://docs.python.org/3/library/urllib.htm
 from bs4 import BeautifulSoup  # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 # My modules.
 import toolbox  # https://github.com/doug-foster/find-a-grave-tools
+import requests  # https://pypi.org/project/requests/
 
 # --- Globals. ---
-path_to_stash = 'stash/'
-path_to_output = 'output/'
+path_to_stash = 'C:\\Dev\\FindAGrave\\Stash\\'
+path_to_output = 'C:\\Dev\\FindAGrave\\Output\\'
 master_list = 'master_list.txt'
 master_index = 'master_index.txt'
 find_a_grave = 'https://www.findagrave.com'
@@ -125,6 +126,26 @@ row_data = [
 #  Return a dictionary of digging instructions.
 #  Last update: 2024/06/04 @ 09:00pm.
 # --------------------------------------------\
+def getUrls() :
+    # --- Vars. ---
+	urls = []
+
+	# --- Get lines from instructions file. ---
+	lines = toolbox.get_instructions(1)  # Main is one level up, not here.
+	if False == lines :
+		quit()
+	if 0 == len(lines) :
+		toolbox.print_l('Error: no urls')
+		quit()
+
+	# --- Process lines. ---
+	for line in lines :
+		this_line = line.replace('\n', '') #.replace(' ', '')  # Clean & split.
+		urls.append(this_line)
+     
+	return urls
+    
+    
 def dig_instructions() :
 
 	# --- Vars. ---
@@ -153,7 +174,7 @@ def dig_instructions() :
 
 		# --- Check group for errors. ---
 		# e.g. { 1682503 : [group, group] }
-		called_by = inspect.stack()[1].filename.rsplit('/', 1)[1]
+		called_by = inspect.stack()[1].filename.rsplit('\\', 1)[1]
 		groups = []
 		check_groups = family_groups_all
 		if len(this_line) > 1 :  # There are one or more group(s)).
@@ -191,23 +212,13 @@ def dig_instructions() :
 #  Sister function is find_family_urls().
 #  Build an list file, return an array.
 # --------------------------------------------\
-def find_burial_urls(args) :
+def get_memorials(session, searchUrl) :
 
-	# --- Define vars. ---
-	session = args[0]
-	cemetery_id = args[1]
-	path_to_list = args[2]
-	group = args[3]
-	max_pages = 200
+	max_pages = 500
 	page = 1
 	loop = True
-	memorial_urls = []
-	# toolbox.print_l()
+	memorials = []
 
-	# --- Create group list. ---
-	f = open(path_to_list[group], 'w')
-
-	# --- Loop index pages. ---
 	while (loop) :
 
 		# --- Prevent runaways. ---
@@ -216,10 +227,7 @@ def find_burial_urls(args) :
 			quit()
 
 		# --- Get index page. ---
-		cemetery_index = find_a_grave + '/cemetery/' + cemetery_id 
-		cemetery_index_page = cemetery_index + '/memorial-search?page=' + \
-		str(page)  # Set page URL.
-		request = toolbox.get_url(session, cemetery_index_page)  # Get page.
+		request = toolbox.get_url(session, searchUrl + '&page=' + str(page))
 
 		# -- Make burial soup. --
 		soup = BeautifulSoup(request.content, 'html.parser')
@@ -235,33 +243,37 @@ def find_burial_urls(args) :
 		if not loop :
 			break
 	
-		# --- Find memorial pages. ---
-		toolbox.print_l('Pulling "' + group + '" links from index ' + 
-			cemetery_index_page)
 		# Search page for memorial items.
 		memorials = soup_find(soup, 'memorials')
-		# URL format: "https://www.findagrave.com/memorial/84600372/albert-mike-albrecht"
 
-		# --- Loop memorial pages. ---
+		toolbox.print_l('page ' + str(page) + ' has ' + str(len(memorials)) + ' memorials.')
+
+		# --- Loop memorials ---
 		for memorial in memorials : # Loop memorial items.
-			if len(memorial.find_all('a')) > 0 : # Check if item has a link.
-				memorial_url = find_a_grave + memorial.a['href']
-				f.write(memorial_url + '\n') # Update burial list.
-				memorial_urls.append(memorial_url)
+			memorial_url = memorial.a['href']
+
+			small_tag = memorial.find('small')  # Find the first <small> tag in the current 'div'
+			noPhoto = small_tag and 'No grave photo' in small_tag.get_text()
+
+			name = memorial.find('.name-grave').get_text()
+
+			dates = memorial.find('.birthDeathDates').get_text()
+			plot = memorial.find('strong').get_text()
+   
+			memorials.append({
+       			'url': memorial_url, 
+          		'name': name, 
+            	'dates': dates,
+             	'plot': plot, 
+              	'noPhoto': noPhoto
+			})
+
 		if (loop) :
 			page += 1  # Increment page.
 			toolbox.pause(0.5,2,True)  # Pace requests.
-			toolbox.print_l('Next page.')
 
-	# --- Finish. ---
-	f.close()
-	toolbox.remove_last_byte(f, path_to_list[group])  # Remove dangling "\n".
-	if 0 == len(memorial_urls) :
-		toolbox.print_l('Error: no memorials in cemetery ' + cemetery_id + '.')
-		quit()
-	else :
-		toolbox.print_l('Done - (' + str(len(memorial_urls)) + ') links found.')
-		return memorial_urls
+	return memorials
+
 # --------------------------------------------/	
 
 
@@ -329,7 +341,7 @@ def stash_group_page(args) :
 	request = toolbox.get_url(session, url)
 			
 	# --- Set the stash file name. ---
-	page = path_to_folder[group] + '/'
+	page = path_to_folder[group] + '\\'
 	burial_slug = burial_url.split('/memorial/')[1].replace('/', '_')
 	if 'burial' == group :
 		page = page + burial_slug
@@ -819,7 +831,8 @@ def soup_find(soup, what, type='', value='') :
 			if None == cup_of_soup : return ''
 			else : return cup_of_soup
 		case 'memorials' :
-			cup_of_soup = soup.find_all('div', {'class' : 'memorial-item'})
+			mainList = soup.find('div', {'class' : 'memorial-list-data'})
+			cup_of_soup = mainList.find_all('div', {'class' : 'memorial-item'})
 			if None == cup_of_soup : return ''
 			else : return cup_of_soup
 		case 'cemetery' :

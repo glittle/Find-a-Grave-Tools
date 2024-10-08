@@ -33,7 +33,7 @@ cookie_domain = grave_digger.cookie_domain
 path_to_stash = grave_digger.path_to_stash
 burial_urls = []
 master_list_of_urls = []
-this_script = __file__.split('/')
+this_script = __file__.split('\\')
 this_script = this_script[len(this_script)-1]
 
 # --- Functions. ---
@@ -85,32 +85,32 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 
 	# --- File & folder path dictionaries. ---
 	path_to_list = {
-		'burial' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'burial' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_burials_list.txt',
-		'parent' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'parent' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_parents_list.txt',
-		'spouse' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'spouse' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_spouses_list.txt',
-		'child' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'child' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_children_list.txt',
-		'sibling' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'sibling' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_siblings_list.txt',
-		'half-sibling' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'half-sibling' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_half-siblings_list.txt'
 	}
 	path_to_folder = {
 		'cemetery' : path_to_cemetery_folder,
-		'burial' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'burial' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_burials',
-		'parent' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'parent' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_parents',
-		'spouse' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'spouse' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_spouses',
-		'child' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'child' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_children',
-		'sibling' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'sibling' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_siblings',
-		'half-sibling' : path_to_cemetery_folder + '/' + cemetery_id + \
+		'half-sibling' : path_to_cemetery_folder + '\\' + cemetery_id + \
 			'_half-siblings'
 	}
 
@@ -167,8 +167,8 @@ for cemetery_id, groups in instructions.items() : # Loop cemeteries.
 				toolbox.print_l(str(this_burial) + ' of ' + str(num_burials) 
 		 			+ ' "burial" pages - ' + burial_url)  # User status.
 				burial_slug = burial_url.split('/memorial/')[1]
-				burial_slug = burial_slug.replace('/', '_')
-				burial_page = path_to_folder['burial'] + '/' + \
+				burial_slug = burial_slug.replace('\\', '_')
+				burial_page = path_to_folder['burial'] + '\\' + \
 					burial_slug + '.html'
 				# Make burial soup.
 				toolbox.print_l('- ' + burial_url)

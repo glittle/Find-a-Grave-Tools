@@ -67,7 +67,7 @@ for cemetery_id, groups in instructions.items() :
 	cemetery_id =  cemetery_id.split('-')[0]  # Cemetery id.
 
 	# --- Get cemetery folder. ---
-	cemetery_folder = glob.glob(path_to_stash + '/' + cemetery_id + '*_*/')[0]
+	cemetery_folder = glob.glob(path_to_stash + '\\' + cemetery_id + '*_*/')[0]
 	if not os.path.exists(cemetery_folder) :  # Does folder exit?
 		toolbox.print_l('Error: Folder for cemetery id="' + cemetery_id +
 			'" does not exist.')
@@ -95,8 +95,8 @@ for cemetery_id, groups in instructions.items() :
 	f.close
 	# Set file path for each burial file.
 	for line in lines :
-		line = '_'.join(line.rsplit('/',1))
-		line = burial_folder + '/' + line.replace(fag_prefix, '') + '.html'
+		line = '_'.join(line.rsplit('\\',1))
+		line = burial_folder + '\\' + line.replace(fag_prefix, '') + '.html'
 		burials.append(line)
 
 	# --- Add a cemetery worksheet. ---

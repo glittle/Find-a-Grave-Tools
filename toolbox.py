@@ -79,8 +79,8 @@ def get_instructions(level:int = 0) :
 	# --- Vars. ---
 	level += 1
 	called_by = inspect.stack()[level].filename
-	file_name_parts = called_by.rsplit('/',1)
-	file_path = file_name_parts[0] + '/' + path_to_instructions
+	file_name_parts = called_by.rsplit('\\',1)
+	file_path = file_name_parts[0] + '\\' + path_to_instructions
 	file_stub = file_name_parts[1]
 	file_short_name = file_stub.replace('.py', '.txt')
 	file_full_name = file_path + file_short_name

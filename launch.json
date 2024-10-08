@@ -1,0 +1,12 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Python: Search Memorials",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}\\search_memorials.py",
+      "console": "integratedTerminal"
+    }
+  ]
+}
